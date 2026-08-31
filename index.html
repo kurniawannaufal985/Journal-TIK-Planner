@@ -426,25 +426,326 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxx_zfTiM2RCLnIIqTttCm1MyHf3Z09mlbQzzlbNjrBedW_tPbXThwCqO10yjjhtyJheg/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdSYDIlb1biC2u9zGkt8Fd8pgNkbMBPA_VkPzLy84Ao8-UOAEjX1n2gcYLNSnAigVsBg/exec";
     let rawDataStore = [];
     let rawAbsensiData = [];
     let rawNilaiData = [];
 
     const masterSiswa = {
-      "4A": [{"no": 1, "nama": "Al Birru Raga Syahumpri"}, {"no": 2, "nama": "Arsenio Ananda Abqori"}, {"no": 3, "nama": "Azzam Al Fattah Kurniawan"}, {"no": 4, "nama": "Ibrahim El Shabir Al Fajri"}, {"no": 5, "nama": "M. Rafandra Afkari Purwanto"}, {"no": 6, "nama": "M. Rayyan"}, {"no": 7, "nama": "M. Sauqi Humaida Ghaisan"}, {"no": 8, "nama": "M. Sayyidul Ayyam"}, {"no": 9, "nama": "Muhammad Bilal Ramadhan"}, {"no": 10, "nama": "Muhammad Rizky Hafidz M"}, {"no": 11, "nama": "Sultan Zaki Yamani"}, {"no": 12, "nama": "Ahmad Khalid Al Fatih"}, {"no": 13, "nama": "Aisya Nafeeza Aina Kusnadi"}, {"no": 14, "nama": "Aisyah Nur Fitria"}, {"no": 15, "nama": "Alya Farhana"}, {"no": 16, "nama": "Alya Nur Asyifa"}, {"no": 17, "nama": "Ananda Rania Syaquitta N."}, {"no": 18, "nama": "Aqila Mahveen Bening Inara"}, {"no": 19, "nama": "Faiza Husna Mufida"}, {"no": 20, "nama": "Febriyanti Sholihatul Khasanah"}, {"no": 21, "nama": "Khalisa Yumna Fatin"}, {"no": 22, "nama": "Mikayla Annisa Shalihah"}, {"no": 23, "nama": "Nazia Shafa Syazwani"}, {"no": 24, "nama": "Safa Nur Inayah"}],
-      "4B": [{"no": 1, "nama": "Abimanyu Indradewa"}, {"no": 2, "nama": "Abrar Syafiq Ramadan"}, {"no": 3, "nama": "Althaf Figo Kurniawan"}, {"no": 4, "nama": "Amzar Danish Abrisam"}, {"no": 5, "nama": "Azka Putra Kusuma"}, {"no": 6, "nama": "Farras Faeyza Athariz"}, {"no": 7, "nama": "Fathan Nur Hafidz"}, {"no": 8, "nama": "Ibrahim Malik Al Habsy"}, {"no": 9, "nama": "Khoirul Anam Ramadhan"}, {"no": 10, "nama": "M. Faiq Dzakwan Khairy"}, {"no": 11, "nama": "M. Kenzie Pradipta Wardana"}, {"no": 12, "nama": "M. Rizky Ramadhan"}, {"no": 13, "nama": "M. Shakeil Azfer Arifin"}, {"no": 14, "nama": "M. Tsabit Hibatullah Nura"}, {"no": 15, "nama": "Muhamad Ziyad Farhat"}, {"no": 16, "nama": "Adelia Putri Kirani"}, {"no": 17, "nama": "Adeeva Afshin Myesha"}, {"no": 18, "nama": "Ameera Syahira Ananta"}, {"no": 19, "nama": "Aqila Zhafira Wardani"}, {"no": 20, "nama": "Azkayra Nabila Syafiqah"}, {"no": 21, "nama": "Dzakira Talita Nuha"}, {"no": 22, "nama": "Fiorenza Syaquilla"}, {"no": 23, "nama": "Haura Sakhi Zenia A. S."}, {"no": 24, "nama": "Humaira Qanita Ashalina"}],
-      "4C": [{"no": 1, "nama": "Abdurrobbi Attaqi Haneeyyah"}, {"no": 2, "nama": "Ahmad Amru Kintoko"}, {"no": 3, "nama": "Alesha Putri Chairunnisa"}, {"no": 4, "nama": "Alisha Syifa Nabila"}, {"no": 5, "nama": "Almaira Zahrani Inaya"}, {"no": 6, "nama": "Andara Nayla Rahma"}, {"no": 7, "nama": "Azzahra Rasiyah Subhani"}, {"no": 8, "nama": "Bilal Ramadhan"}, {"no": 9, "nama": "Clarissa Anindya Sani"}, {"no": 10, "nama": "Dzaky Arkana Danendra"}, {"no": 11, "nama": "El Fatih Ahmad Syafiq"}, {"no": 12, "nama": "Fatih Rizky Pratama"}, {"no": 13, "nama": "Hafizah Khairunnisa"}, {"no": 14, "nama": "Kanza Aulia Rahma"}, {"no": 15, "nama": "Khayra Lubna Alula"}, {"no": 16, "nama": "M. Al Fatih Rabbani"}, {"no": 17, "nama": "M. Daffa Al Fatih"}, {"no": 18, "nama": "M. Rayyan Al Ghifari"}, {"no": 19, "nama": "Nabila Hilma Ramadhani"}, {"no": 20, "nama": "Naufal Ahmad Al Ghifari"}, {"no": 21, "nama": "Qonita Hafizah"}, {"no": 22, "nama": "Razaq Zhafran Al Fatih"}, {"no": 23, "nama": "Syahla Nur Rahma"}, {"no": 24, "nama": "Zayyan Ahmad Al Farisi"}],
-      "4D": [{"no": 1, "nama": "Abqari Khafid Sumanjaya"}, {"no": 2, "nama": "Alceo Ega Raharjo"}, {"no": 3, "nama": "Anargya Syifa Khaliluna"}, {"no": 4, "nama": "Aulia Nisa Syafiqah"}, {"no": 5, "nama": "Danendra Arya Pradana"}, {"no": 6, "nama": "Faeyza Ahmad Zayyan"}, {"no": 7, "nama": "Hafizhah Nuha Syafiqah"}, {"no": 8, "nama": "Khansa Aulia Putri"}, {"no": 9, "nama": "Luqman Ahmad Al Fatih"}, {"no": 10, "nama": "M. Aksa Al Ghifari"}, {"no": 11, "nama": "M. Bilal Ramadhan"}, {"no": 12, "nama": "M. Dzakwan Al Fatih"}, {"no": 13, "nama": "M. Fatih Rabbani"}, {"no": 14, "nama": "Nayla Hilma Syakira"}, {"no": 15, "nama": "Nizam Ahmad Al Farisi"}, {"no": 16, "nama": "Raffasya Ahmad Zayyan"}, {"no": 17, "nama": "Rania Syafiqah Putri"}, {"no": 18, "nama": "Siti Aisyah Nur Aini"}, {"no": 19, "nama": "Sultan Ahmad Al Fatih"}, {"no": 20, "nama": "Syahla Qonita Nuha"}, {"no": 21, "nama": "Talita Hasna Humaira"}, {"no": 22, "nama": "Yumna Aulia Rahma"}, {"no": 23, "nama": "Zaydan Ahmad Al Farisi"}, {"no": 24, "nama": "Arjuna Azka Wiratama"}],
-      "4E": [{"no": 1, "nama": "Adiba Fatin Azzahra Widiarto"}, {"no": 2, "nama": "Aisyah Ayudia Inara"}, {"no": 3, "nama": "Amira Nur Humaira"}, {"no": 4, "nama": "Anindya Keisha Zahra"}, {"no": 5, "nama": "Ayla Varisha Aina"}, {"no": 6, "nama": "Azka Bilal Ramadhan"}, {"no": 7, "nama": "Daffa Ahmad Zayyan"}, {"no": 8, "nama": "Fathir Ahmad Al Fatih"}, {"no": 9, "nama": "Hafizah Nabila Syakira"}, {"no": 10, "nama": "Khansa Hasna Humaira"}, {"no": 11, "nama": "M. Al Fatih Rabbani"}, {"no": 12, "nama": "M. Bilal Al Farisi"}, {"no": 13, "nama": "M. Dzakwan Rabbani"}, {"no": 14, "nama": "M. Fatih Al Ghifari"}, {"no": 15, "nama": "Nayla Qonita Nuha"}, {"no": 16, "nama": "Nizam Ahmad Al Farisi"}, {"no": 17, "nama": "Raffasya Al Farisi"}, {"no": 18, "nama": "Rania Aulia Rahma"}, {"no": 19, "nama": "Siti Nur Aini"}, {"no": 20, "nama": "Sultan Al Ghifari"}, {"no": 21, "nama": "Syahla Hasna Humaira"}, {"no": 22, "nama": "Talita Nabila Syakira"}, {"no": 23, "nama": "Yumna Qonita Nuha"}, {"no": 24, "nama": "Zaydan Rabbani"}],
-      "5A": [{"no": 1, "nama": "Abiyyu Mufid Hariyadi"}, {"no": 2, "nama": "Adiba Aairah Nurrizkiya"}, {"no": 3, "nama": "Ahmadyasta El Hafizhy Gathandi"}, {"no": 4, "nama": "Alesha Alika Putri Utomo"}, {"no": 5, "nama": "Almaira Dzikra Azzahwa"}, {"no": 6, "nama": "Aqiyas Putra Wardana"}, {"no": 7, "nama": "Daniswara Ariobimo Putra Aji"}, {"no": 8, "nama": "Ghazi Elfatih Wildani"}, {"no": 9, "nama": "Hafshah Humairah Putri Asti"}, {"no": 10, "nama": "Kenzo Ahmad Guswantoro"}, {"no": 11, "nama": "Mahreen Mustika Sadikin"}, {"no": 12, "nama": "Muhammad Alfatih Subarkah"}, {"no": 13, "nama": "Muhammad Aufa Muzzamil"}, {"no": 14, "nama": "Muhammad Rizky Saputra"}, {"no": 15, "nama": "Nadhira Azmi Athifa"}, {"no": 16, "nama": "Prajna Paramita Maharesmi"}, {"no": 17, "nama": "Queen Syafana Almahyra"}, {"no": 18, "nama": "Siti Nur Inayah Saputri"}, {"no": 19, "nama": "Zayyana Almaira Qanita"}],
-      "5B": [{"no": 1, "nama": "Adiba Asiyah Ramadhani"}, {"no": 2, "nama": "Adzana Khaira Hanum"}, {"no": 3, "nama": "Ahmad Rafkha Al-Hafizh"}, {"no": 4, "nama": "Aqeela Ajwa Khairunnisa"}, {"no": 5, "nama": "Athariz Zayyan Alkhalifi"}, {"no": 6, "nama": "Aurora Yumna Elshabira"}, {"no": 7, "nama": "Chayra Fayyola Nadhifa"}, {"no": 8, "nama": "Fa Issaura Almahyra"}, {"no": 9, "nama": "Fariz Maulana Arsyi"}, {"no": 10, "nama": "Fatih Alfarizi"}, {"no": 11, "nama": "Fawwaz Zeeshan Hamizan"}, {"no": 12, "nama": "Ghaniyya Sheza Farhana"}, {"no": 13, "nama": "Inara Ayla Ghassani"}, {"no": 14, "nama": "Kiandra Zayan Hamizan"}, {"no": 15, "nama": "M. Alaric Basyir Ziyad"}, {"no": 16, "nama": "M. Azka Aldebaran Utomo"}, {"no": 17, "nama": "Meisa Anindita Cahyani"}, {"no": 18, "nama": "Muhammad Nizam Al Habsyi"}, {"no": 19, "nama": "Rizqia Allya Adreena"}, {"no": 20, "nama": "Syahla Humaira Wibowo"}],
-      "5C": [{"no": 1, "nama": "Ahmad Arkan Hidayat"}, {"no": 2, "nama": "Alesha Zahsi Andrian"}, {"no": 3, "nama": "Almaira Shidqiyah Nukuhaly"}, {"no": 4, "nama": "Alzena Manha Laiqa Nur Fitria"}, {"no": 5, "nama": "Andito Aushaf Kahanan"}, {"no": 6, "nama": "Anindita Keisha Zahra"}, {"no": 7, "nama": "Aura Athaleta Inara"}, {"no": 8, "nama": "Dhaffin Aldric Maulana"}, {"no": 9, "nama": "Fatin Nadira Al Mumtaza"}, {"no": 10, "nama": "Fildzan Dwibima Nurhidayat"}, {"no": 11, "nama": "Gendis  Ayu Beningati"}, {"no": 12, "nama": "Hanania Aira Nur Mufida"}, {"no": 13, "nama": "Kalifa Humaira Zhafirah"}, {"no": 14, "nama": "Khansa Lathifa Subagyo"}, {"no": 15, "nama": "M. Daffa Ramadhan Subhi"}, {"no": 16, "nama": "Muhammad Bilal An-Nafi"}, {"no": 17, "nama": "Pradipta Adya Kusuma"}, {"no": 18, "nama": "Raziq Hanan Hafizuddin"}, {"no": 19, "nama": "Zaida Nafeesa Setiadi"}],
-      "5D": [{"no": 1, "nama": "Ahmad Khalid Al Fatih"}, {"no": 2, "nama": "Aisha Nafeesa Humaira"}, {"no": 3, "nama": "Alisha Syifa Az-Zahra"}, {"no": 4, "nama": "Amira Nurul Asyifa"}, {"no": 5, "nama": "Anindya Keisha Putri"}, {"no": 6, "nama": "Azka Putra Ramadhan"}, {"no": 7, "nama": "Danendra Arya Kusuma"}, {"no": 8, "nama": "Faeyza Ahmad Al Fatih"}, {"no": 9, "nama": "Hafizhah Nuha Syafiqah"}, {"no": 10, "nama": "Khansa Aulia Rahma"}, {"no": 11, "nama": "M. Aksa Al Ghifari"}, {"no": 12, "nama": "M. Bilal Ramadhan"}, {"no": 13, "nama": "M. Dzakwan Al Fatih"}, {"no": 14, "nama": "Nayla Hilma Syakira"}, {"no": 15, "nama": "Nizam Ahmad Al Farisi"}, {"no": 16, "nama": "Raffasya Ahmad Zayyan"}, {"no": 17, "nama": "Rania Syafiqah Putri"}, {"no": 18, "nama": "Siti Aisyah Nur Aini"}, {"no": 19, "nama": "Sultan Ahmad Al Fatih"}],
-      "6A": [{"no": 1, "nama": "Ahmad Nadif"}, {"no": 2, "nama": "Ahmad Zafran Al Wafi"}, {"no": 3, "nama": "Alifa Hibatiliah"}, {"no": 4, "nama": "Alzena Nabilah Anindya Purwa"}, {"no": 5, "nama": "Ardio Pratama Ariandi"}, {"no": 6, "nama": "Ardiva Nova Azzahra"}, {"no": 7, "nama": "Dhafin Ahmad Alfarizqi"}, {"no": 8, "nama": "Fakhira Aulia Nissa"}, {"no": 9, "nama": "Firendra Ghazi Erdhiya"}, {"no": 10, "nama": "Harsya Khayri Afnan"}, {"no": 11, "nama": "Humaira Kamil Azkadina"}, {"no": 12, "nama": "Jaidan Dzikri Albukhori Sani"}, {"no": 13, "nama": "Leandra Aqeela Paris"}, {"no": 14, "nama": "Mahveen Bintang Virdaus"}, {"no": 15, "nama": "Michaelia Shafa Mubarok"}, {"no": 16, "nama": "Muhammad Khairul Anam"}, {"no": 17, "nama": "Nur Hamda Tsaniyyah AS"}, {"no": 18, "nama": "Oemar Mukhtar Ariwarna"}, {"no": 19, "nama": "Raihan Ardatino Rachman"}, {"no": 20, "nama": "Rania Shafiya Hakim"}, {"no": 21, "nama": "Shafira Nissa Izzati"}, {"no": 22, "nama": "Syafiq Izzul Hakim"}, {"no": 23, "nama": "Ufaira Uswatunnisa"}],
-      "6B": [{"no": 1, "nama": "Abu Haura"}, {"no": 2, "nama": "Adiba Faranisa Aznii"}, {"no": 3, "nama": "Ainayya Mazaya Waluyo"}, {"no": 4, "nama": "Alfareza Deyyan Hanindita"}, {"no": 5, "nama": "Aliya Izzatul Hayaah"}, {"no": 6, "nama": "Annisa Aqilah Aisla"}, {"no": 7, "nama": "Azka Zhafran Khairy S"}, {"no": 8, "nama": "Darrel Ghaisan Ramadhan"}, {"no": 9, "nama": "Faranisa Safna Fela Nugraha"}, {"no": 10, "nama": "Fathimah Zian Sarah"}, {"no": 11, "nama": "Fhaila Azita Syailest"}, {"no": 12, "nama": "Fico Athallah Harnuanto"}, {"no": 13, "nama": "Firdaus Arkasena Nismara"}, {"no": 14, "nama": "Muhamad Syazwan Firdausa"}, {"no": 15, "nama": "Muhammad Hasan Alfaiz"}, {"no": 16, "nama": "Muhammad Ziyad Al-waqosh"}, {"no": 17, "nama": "Nadia Zhafira"}, {"no": 18, "nama": "Naira Alifia Candra"}, {"no": 19, "nama": "Naufal Fadhir Rahman"}, {"no": 20, "nama": "Sachio Alfarisqi"}, {"no": 21, "nama": "Shofia Adzka Nabila"}, {"no": 22, "nama": "Talita Shiva"}, {"no": 23, "nama": "Teuku Faizan Al Azzami"}],
-      "6C": [{"no": 1, "nama": "Aaq Qowi Sumanjaya"}, {"no": 2, "nama": "Ainayya Fathiyaturahma"}, {"no": 3, "nama": "Aluna Chiandanie Gumelar"}, {"no": 4, "nama": "Aqila Izzatunnisa Prameswari"}, {"no": 5, "nama": "Athariz Khalif Fernandi"}, {"no": 6, "nama": "Athaya Dalisha Maulana"}, {"no": 7, "nama": "Azalia Zelda Azkadina"}, {"no": 8, "nama": "Faqih Abdurrahman Rifai"}, {"no": 9, "nama": "Hifdzatus Sa'diah El Adlia"}, {"no": 10, "nama": "Ibrahim Karim Wibowo"}, {"no": 11, "nama": "Imad Ahsanul Qoid"}, {"no": 12, "nama": "Keisha Tri Ramadhani"}, {"no": 13, "nama": "Muhammad Gavriel Alvaro"}, {"no": 14, "nama": "Muhammad Rafa Adzkia"}, {"no": 15, "nama": "Muhammad Rasya Athaya"}, {"no": 16, "nama": "Nur'aina Tsalisa Rayhania"}, {"no": 17, "nama": "Qafisha Qurratul Aini"}, {"no": 18, "nama": "Rafandra Theo Ardhani"}, {"no": 19, "nama": "Rayyan Anandra Musyaffa"}, {"no": 20, "nama": "Revalina Prischilia Aldian"}, {"no": 21, "nama": "Ridwan Rassya Owen Hakiki"}, {"no": 22, "nama": "Syakira Nissa Izzati"}, {"no": 23, "nama": "Syathir Muhammad Azfar Althaf"}],
-      "6D": [{"no": 1, "nama": "Alya Nadhifa Putri Kusuma"}, {"no": 2, "nama": "Ameera Oryza Sativa Setiyawan"}, {"no": 3, "nama": "Athmar Anandhes Kurniawan"}, {"no": 4, "nama": "Attayya Kaili Chaerunnisa"}, {"no": 5, "nama": "Ayra Haflamira Rahmat"}, {"no": 6, "nama": "Azka Azizah Hidayat"}, {"no": 7, "nama": "Azlan Mustafa Sadikin"}, {"no": 8, "nama": "Azzalea Aqilah"}, {"no": 9, "nama": "Elnino Raffaza Arif"}, {"no": 10, "nama": "Farrell Alvaronizam"}, {"no": 11, "nama": "Hafiz Prima Cendekia"}, {"no": 12, "nama": "Khaliza Meidina Balqis R"}, {"no": 13, "nama": "Maryam Syaheera Harumi"}, {"no": 14, "nama": "Muhammad Pramudya Pratama"}, {"no": 15, "nama": "Nai Agatha Ramadhani"}, {"no": 16, "nama": "Nasha sabria azkayra"}, {"no": 17, "nama": "Nayla Muazara Ulfa Muta Aaliy"}, {"no": 18, "nama": "Rafif Fathurrahman"}, {"no": 19, "nama": "Rayyan Igo  Pamungkas"}, {"no": 20, "nama": "Shafana Vallerie Nugroho"}, {"no": 21, "nama": "Syahdan Dzaki Altaff"}, {"no": 22, "nama": "Umar Abdul Aziz Lubis"}, {"no": 23, "nama": "Zafran Abrisam Maulana Haqqi"}]
+      "4A": [
+        { "no": 1, "nama": "Al Birru Raga Syahumpri" },
+        { "no": 2, "nama": "Arsenio Ananda Abqori" },
+        { "no": 3, "nama": "Azzam Al Fattah Kurniawan" },
+        { "no": 4, "nama": "Fadhlan Erdogan" },
+        { "no": 5, "nama": "Gendis Shabrina Nuralifa" },
+        { "no": 6, "nama": "Ghaisan Array Pramana" },
+        { "no": 7, "nama": "Ghina Inayah" },
+        { "no": 8, "nama": "Hafidza Ahna Farihah" },
+        { "no": 9, "nama": "Hafiqa Anindita Husna" },
+        { "no": 10, "nama": "Hana Izzatunnisa" },
+        { "no": 11, "nama": "Ibrahim Athallah Irvani" },
+        { "no": 12, "nama": "Jehan Almahyra Mecca" },
+        { "no": 13, "nama": "Karina Naladeva Almaarief" },
+        { "no": 14, "nama": "Khadijah Samila" },
+        { "no": 15, "nama": "Mahreen Naima Almedina" },
+        { "no": 16, "nama": "Mishal Azfer Fathian" },
+        { "no": 17, "nama": "Muhammad Rafif Alfarezi" },
+        { "no": 18, "nama": "Rahardian Kael Setiawan" },
+        { "no": 19, "nama": "Safaira Putri Kusuma" },
+        { "no": 20, "nama": "Shanika Umaiza" },
+        { "no": 21, "nama": "Surga Faiha Shaliha" },
+        { "no": 22, "nama": "Syafiqah Firzanah Althafunnisa" },
+        { "no": 23, "nama": "Umar Karim Fatahillah" },
+        { "no": 24, "nama": "Zidane Alfatih Raqila Shahbaz" }
+      ],
+      "4B": [
+        { "no": 1, "nama": "Abimanyu Indradewa" },
+        { "no": 2, "nama": "Abrar Syafiq Ramadan" },
+        { "no": 3, "nama": "Althaf Figo Kurniawan" },
+        { "no": 4, "nama": "Alya Nidaul Karimah" },
+        { "no": 5, "nama": "Auliya Az-Zahrah" },
+        { "no": 6, "nama": "Azzalia Salsabila Queensha Yudira" },
+        { "no": 7, "nama": "Daffa Alif Alfarizqi" },
+        { "no": 8, "nama": "Fidelio Shaquile Gavyn Nainggolan" },
+        { "no": 9, "nama": "Guinandra Fawish Aiden" },
+        { "no": 10, "nama": "Hamizan Althaff Lukiawan" },
+        { "no": 11, "nama": "Hanifah Ghayda Muhtasyam" },
+        { "no": 12, "nama": "Hanna Siti Maryam" },
+        { "no": 13, "nama": "Kayyisa Azkadina" },
+        { "no": 14, "nama": "Kiano Alrafaeyza Harnuanto" },
+        { "no": 15, "nama": "Laode Alvaronizam Akmar" },
+        { "no": 16, "nama": "Mikayla Heaserra Anaketio" },
+        { "no": 17, "nama": "Muhammad Rashid As-Shiddiq" },
+        { "no": 18, "nama": "Naura Jihan Azzahra" },
+        { "no": 19, "nama": "Nazila Andhisa Mahveen" },
+        { "no": 20, "nama": "Nur Haidar Almairi Tsaqib" },
+        { "no": 21, "nama": "Rayyan Atalla Zavier" },
+        { "no": 22, "nama": "Shadia Tsuraya Nugroho" },
+        { "no": 23, "nama": "Sofia Elmira Azkadina" },
+        { "no": 24, "nama": "Yukeiko Kamila Putri Kelana" }
+      ],
+      "4C": [
+        { "no": 1, "nama": "Abdurrobbi Attaqi Haneeyyah" },
+        { "no": 2, "nama": "Ahmad Amru Kintoko" },
+        { "no": 3, "nama": "Alesha Putri Chairunnisa" },
+        { "no": 4, "nama": "Aliyahayu Kayshila Pangayuh" },
+        { "no": 5, "nama": "Almeera Rainy Khumaira" },
+        { "no": 6, "nama": "Alsyamra Rasezha Shihan" },
+        { "no": 7, "nama": "Artanabil Faeyza Yazid Abbasy" },
+        { "no": 8, "nama": "Danish Asyraf Fahreza" },
+        { "no": 9, "nama": "Eldira Rahma Hayuningtyas" },
+        { "no": 10, "nama": "Farsya Zerina Mahreen Rusthady" },
+        { "no": 11, "nama": "Halima Nahda Ashadia" },
+        { "no": 12, "nama": "Hasya Aulia Az Zahra" },
+        { "no": 13, "nama": "Ibrahim Arkan Al Farisi" },
+        { "no": 14, "nama": "Kalyana Adzkiya Vivaldy" },
+        { "no": 15, "nama": "Lubna Luvena Maysun" },
+        { "no": 16, "nama": "Maryam Hamalatul Bayan" },
+        { "no": 17, "nama": "Muhammad Althaf Aulian" },
+        { "no": 18, "nama": "Muhammad Fahry Al Zaidhan" },
+        { "no": 19, "nama": "Muhammad Hanif Kamil" },
+        { "no": 20, "nama": "Muhammad Kholif Al Hafidz" },
+        { "no": 21, "nama": "Negara Adhya Prananta Harahap" },
+        { "no": 22, "nama": "Qiana Naira Shaliha" },
+        { "no": 23, "nama": "Rajendra Alim Ariyani" },
+        { "no": 24, "nama": "Restuandaru" }
+      ],
+      "4D": [
+        { "no": 1, "nama": "Abqari Khafid Sumanjaya" },
+        { "no": 2, "nama": "Alceo Ega Raharjo" },
+        { "no": 3, "nama": "Anargya Syifa Khaliluna" },
+        { "no": 4, "nama": "Aqeelah Adrianayda" },
+        { "no": 5, "nama": "Arcilla Ziya Falisha" },
+        { "no": 6, "nama": "Arfan Fairel Kefrisya" },
+        { "no": 7, "nama": "Askana Sakhi Nurdzikrulloh" },
+        { "no": 8, "nama": "Asyifa Ega Nuraeyza" },
+        { "no": 9, "nama": "Calista Aisha Sachi" },
+        { "no": 10, "nama": "Dastan Tara Rizky" },
+        { "no": 11, "nama": "Fatima Aqilla Azahra Ramadhani" },
+        { "no": 12, "nama": "Hana Felysia" },
+        { "no": 13, "nama": "Hanun Rihadatul Aisy" },
+        { "no": 14, "nama": "Maryam Dini Zelenka" },
+        { "no": 15, "nama": "Mezzaluna Clarissa Audrey" },
+        { "no": 16, "nama": "Muhammad Azhar Rahmatullah Bawana Putra" },
+        { "no": 17, "nama": "Musthafa Zhafran Santosa" },
+        { "no": 18, "nama": "Nadia Azkadina Aisla" },
+        { "no": 19, "nama": "Raffan Nadif Alfarizqi" },
+        { "no": 20, "nama": "Raka Zhafran Khairi" },
+        { "no": 21, "nama": "Shakila Atmirani Suprapto" },
+        { "no": 22, "nama": "Uwais Alfarizqi Husni" },
+        { "no": 23, "nama": "Zaidan" }
+      ],
+      "4E": [
+        { "no": 1, "nama": "Adiba Fatin Azzahra Widiarto" },
+        { "no": 2, "nama": "Aisyah Ayudia Inara" },
+        { "no": 3, "nama": "Amira Nur Humaira" },
+        { "no": 4, "nama": "Andi Muhammad Arjiyanto Nuzul Ihsan" },
+        { "no": 5, "nama": "Aqil Wahib Averroes" },
+        { "no": 6, "nama": "Arzachel Aditya Ramadhan" },
+        { "no": 7, "nama": "Aulian Azzam Athafariz" },
+        { "no": 8, "nama": "Banyu Biru Wahyu Supiyo" },
+        { "no": 9, "nama": "Hasan Ismail" },
+        { "no": 10, "nama": "Ibnu Syahreza Alsardi" },
+        { "no": 11, "nama": "Kalea Althafiyahza Nugroho" },
+        { "no": 12, "nama": "Karamina Rana Malik" },
+        { "no": 13, "nama": "Keenan Hamizan Mahalani" },
+        { "no": 14, "nama": "Khadijah Puti Kemalahayati" },
+        { "no": 15, "nama": "Khalid Hamzy Imawan" },
+        { "no": 16, "nama": "Mezzayumi Clarissa Audrey" },
+        { "no": 17, "nama": "Muhammad Afifuddin Althaf" },
+        { "no": 18, "nama": "Muhammad Almer Zain" },
+        { "no": 19, "nama": "Muhammad Zhafran Arroyan" },
+        { "no": 20, "nama": "Nurul Aulia Maulida" },
+        { "no": 21, "nama": "Raihanah Alia Dewi" },
+        { "no": 22, "nama": "Shofiyah Ameera Rahma Muta'aaliy" },
+        { "no": 23, "nama": "Zalecha Ininnawa" },
+        { "no": 24, "nama": "Zaura Zhariya Zuliansyah" }
+      ],
+      "5A": [
+        { "no": 1, "nama": "Abiyyu Mufid Hariyadi" },
+        { "no": 2, "nama": "Adiba Aairah Nurrizkiya" },
+        { "no": 3, "nama": "Ahmadyasta El Hafizhy Gathandi" },
+        { "no": 4, "nama": "Alesha Alika Putri Utomo" },
+        { "no": 5, "nama": "Almaira Dzikra Azzahwa" },
+        { "no": 6, "nama": "Aqiyas Putra Wardana" },
+        { "no": 7, "nama": "Daniswara Ariobimo Putra Aji" },
+        { "no": 8, "nama": "Ghazi Elfatih Wildani" },
+        { "no": 9, "nama": "Hafshah Humairah Putri Asti" },
+        { "no": 10, "nama": "Kenzo Ahmad Guswantoro" },
+        { "no": 11, "nama": "Mahreen Mustika Sadikin" },
+        { "no": 12, "nama": "Muhammad Alcander Ramadhan" },
+        { "no": 13, "nama": "Muhammad Hasan Ar Rasyid" },
+        { "no": 14, "nama": "Muhammad Nabil Rafly" },
+        { "no": 15, "nama": "Rafardhan Aksa" },
+        { "no": 16, "nama": "Rajwa Nurfadhilah" },
+        { "no": 17, "nama": "Rana Alimah Khumairah" },
+        { "no": 18, "nama": "Salmaa Kusumo Pramesti" },
+        { "no": 19, "nama": "Shofiyyah Zahrani" }
+      ],
+      "5B": [
+        { "no": 1, "nama": "Adiba Asiyah Ramadhani" },
+        { "no": 2, "nama": "Adzana Khaira Hanum" },
+        { "no": 3, "nama": "Ahmad Rafkha Al-Hafizh" },
+        { "no": 4, "nama": "Aqeela Ajwa Khairunnisa" },
+        { "no": 5, "nama": "Athariz Zayyan Alkhalifi" },
+        { "no": 6, "nama": "Aurora Yumna Elshabira" },
+        { "no": 7, "nama": "Chayra Fayyola Nadhifa" },
+        { "no": 8, "nama": "Fa Issaura Almahyra" },
+        { "no": 9, "nama": "Fariz Maulana Arsyi" },
+        { "no": 10, "nama": "Fatih Alfarizi" },
+        { "no": 11, "nama": "Fawwaz Zeeshan Hamizan" },
+        { "no": 12, "nama": "Mafaaza Muttaqiya" },
+        { "no": 13, "nama": "Muhammad Hilmi Ramadhani" },
+        { "no": 14, "nama": "Nael Khairan Malik" },
+        { "no": 15, "nama": "Naufal Faisalhakim" },
+        { "no": 16, "nama": "Rafif Ramadhan Putro Prasetyo" },
+        { "no": 17, "nama": "Rifki Dwi Maulana" },
+        { "no": 18, "nama": "Saif Umar Hakim" },
+        { "no": 19, "nama": "Syafinah Raina Almahyra" },
+        { "no": 20, "nama": "Zaara Zevanya Zalikha" }
+      ],
+      "5C": [
+        { "no": 1, "nama": "Ahmad Arkan Hidayat" },
+        { "no": 2, "nama": "Alesha Zahsi Andrian" },
+        { "no": 3, "nama": "Almaira Shidqiyah Nukuhaly" },
+        { "no": 4, "nama": "Alzena Manha Laiqa Nur Fitria" },
+        { "no": 5, "nama": "Andito Aushaf Kahanan" },
+        { "no": 6, "nama": "Anindita Keisha Zahra" },
+        { "no": 7, "nama": "Aura Athaleta Inara" },
+        { "no": 8, "nama": "Dhaffin Aldric Maulana" },
+        { "no": 9, "nama": "Fatin Nadira Al Mumtaza" },
+        { "no": 10, "nama": "Fildzan Dwibima Nurhidayat" },
+        { "no": 11, "nama": "Gendis Ayu Beningati" },
+        { "no": 12, "nama": "Izzah Husna Amanina" },
+        { "no": 13, "nama": "Kenzie Faiz Hamizan" },
+        { "no": 14, "nama": "Muhammad Abidzar Hasbi Ginanjar" },
+        { "no": 15, "nama": "Muhammad Ayyash Azizan" },
+        { "no": 16, "nama": "Muhammad Kenzie Athilah Syah" },
+        { "no": 17, "nama": "Muhammad Oziel Leandri" },
+        { "no": 18, "nama": "Muhammad Radithya Davin Alfarezel" },
+        { "no": 19, "nama": "Muhammad Syamil Al Fatih" }
+      ],
+      "5D": [
+        { "no": 1, "nama": "Ahmad Khalid Al Fatih" },
+        { "no": 2, "nama": "Ayra Alfathunnisa Sabira" },
+        { "no": 3, "nama": "Azka The Hamzah" },
+        { "no": 4, "nama": "Azmya Izzatu Nisa" },
+        { "no": 5, "nama": "Azura Tavisha Queena" },
+        { "no": 6, "nama": "Deshan Maulana Razzan" },
+        { "no": 7, "nama": "Fannan Faqiih Nur Rafa" },
+        { "no": 8, "nama": "Farah Niltava Annida" },
+        { "no": 9, "nama": "Keanu Nabriel Arrasya" },
+        { "no": 10, "nama": "Muhammad Afkar Atmaja" },
+        { "no": 11, "nama": "Muhammad Faiq Abqari" },
+        { "no": 12, "nama": "Muhammad Keane Aryasatya" },
+        { "no": 13, "nama": "Muhammad Sakha Rabbani" },
+        { "no": 14, "nama": "Nadhira Thafana" },
+        { "no": 15, "nama": "Rashiif Afsar Hawintoro" },
+        { "no": 16, "nama": "Sahla Saida Karima" },
+        { "no": 17, "nama": "Shahia Aisyah Syafazea" },
+        { "no": 18, "nama": "Shanum Wahida Azzahra" },
+        { "no": 19, "nama": "Umar Khalid Andalusia Al Malik" }
+      ],
+      "6A": [
+        { "no": 1, "nama": "Ahmad Nadif" },
+        { "no": 2, "nama": "Ahmad Zafran Al Wafi" },
+        { "no": 3, "nama": "Alifa Hibatiliah" },
+        { "no": 4, "nama": "Alzena Nabilah Anindya Purwa" },
+        { "no": 5, "nama": "Ardio Pratama Ariandi" },
+        { "no": 6, "nama": "Ardiva Nova Azzahra" },
+        { "no": 7, "nama": "Dhafin Ahmad Alfarizqi" },
+        { "no": 8, "nama": "Fakhira Aulia Nissa" },
+        { "no": 9, "nama": "Firendra Ghazi Erdhiya" },
+        { "no": 10, "nama": "Harsya Khayri Afnan" },
+        { "no": 11, "nama": "Humaira Kamil Azkadina" },
+        { "no": 12, "nama": "Jaidan Dzikri Albukhori Sani" },
+        { "no": 13, "nama": "Leandra Aqeela Paris" },
+        { "no": 14, "nama": "Mahveen Bintang Virdaus" },
+        { "no": 15, "nama": "Michaelia Shafa Mubarok" },
+        { "no": 16, "nama": "Muhammad Khairul Anam" },
+        { "no": 17, "nama": "Nur Hamda Tsaniyyah AS" },
+        { "no": 18, "nama": "Oemar Mukhtar Ariwarna" },
+        { "no": 19, "nama": "Raihan Ardatino Rachman" },
+        { "no": 20, "nama": "Rania Shafiya Hakim" },
+        { "no": 21, "nama": "Shafira Nissa Izzati" },
+        { "no": 22, "nama": "Syafiq Izzul Hakim" },
+        { "no": 23, "nama": "Ufaira Uswatunnisa" }
+      ],
+      "6B": [
+        { "no": 1, "nama": "Abu Haura" },
+        { "no": 2, "nama": "Adiba Faranisa Aznii" },
+        { "no": 3, "nama": "Ainayya Mazaya Waluyo" },
+        { "no": 4, "nama": "Alfareza Deyyan Hanindita" },
+        { "no": 5, "nama": "Aliya Izzatul Hayaah" },
+        { "no": 6, "nama": "Annisa Aqilah Aisla" },
+        { "no": 7, "nama": "Azka Zhafran Khairy S" },
+        { "no": 8, "nama": "Darrel Ghaisan Ramadhan" },
+        { "no": 9, "nama": "Faranisa Safna Fela Nugraha" },
+        { "no": 10, "nama": "Fathimah Zian Sarah" },
+        { "no": 11, "nama": "Fhaila Azita Syailest" },
+        { "no": 12, "nama": "Fico Athallah Harnuanto" },
+        { "no": 13, "nama": "Firdaus Arkasena Nismara" },
+        { "no": 14, "nama": "Muhamad Syazwan Firdausa" },
+        { "no": 15, "nama": "Muhammad Hasan Alfaiz" },
+        { "no": 16, "nama": "Muhammad Ziyad Al-waqosh" },
+        { "no": 17, "nama": "Nadia Zhafira" },
+        { "no": 18, "nama": "Naira Alifia Candra" },
+        { "no": 19, "nama": "Naufal Fadhir Rahman" },
+        { "no": 20, "nama": "Sachio Alfarisqi" },
+        { "no": 21, "nama": "Shofia Adzka Nabila" },
+        { "no": 22, "nama": "Talita Shiva" },
+        { "no": 23, "nama": "Teuku Faizan Al Azzami" }
+      ],
+      "6C": [
+        { "no": 1, "nama": "Aaq Qowi Sumanjaya" },
+        { "no": 2, "nama": "Ainayya Fathiyaturahma" },
+        { "no": 3, "nama": "Aluna Chiandanie Gumelar" },
+        { "no": 4, "nama": "Aqila Izzatunnisa Prameswari" },
+        { "no": 5, "nama": "Athariz Khalif Fernandi" },
+        { "no": 6, "nama": "Athaya Dalisha Maulana" },
+        { "no": 7, "nama": "Azalia Zelda Azkadina" },
+        { "no": 8, "nama": "Faqih Abdurrahman Rifai" },
+        { "no": 9, "nama": "Hifdzatus Sa'diah El Adlia" },
+        { "no": 10, "nama": "Ibrahim Karim Wibowo" },
+        { "no": 11, "nama": "Imad Ahsanul Qoid" },
+        { "no": 12, "nama": "Keisha Tri Ramadhani" },
+        { "no": 13, "nama": "Muhammad Gavriel Alvaro" },
+        { "no": 14, "nama": "Muhammad Rafa Adzkia" },
+        { "no": 15, "nama": "Muhammad Rasya Athaya" },
+        { "no": 16, "nama": "Nur'aina Tsalisa Rayhania" },
+        { "no": 17, "nama": "Qafisha Qurratul Aini" },
+        { "no": 18, "nama": "Rafandra Theo Ardhani" },
+        { "no": 19, "nama": "Rayyan Anandra Musyaffa" },
+        { "no": 20, "nama": "Revalina Prischilia Aldian" },
+        { "no": 21, "nama": "Ridwan Rassya Owen Hakiki" },
+        { "no": 22, "nama": "Syakira Nissa Izzati" },
+        { "no": 23, "nama": "Syathir Muhammad Azfar Althaf" }
+      ],
+      "6D": [
+        { "no": 1, "nama": "Alya Nadhifa Putri Kusuma" },
+        { "no": 2, "nama": "Ameera Oryza Sativa Setiyawan" },
+        { "no": 3, "nama": "Athmar Anandhes Kurniawan" },
+        { "no": 4, "nama": "Attayya Kaili Chaerunnisa" },
+        { "no": 5, "nama": "Ayra Haflamira Rahmat" },
+        { "no": 6, "nama": "Azka Azizah Hidayat" },
+        { "no": 7, "nama": "Azlan Mustafa Sadikin" },
+        { "no": 8, "nama": "Azzalea Aqilah" },
+        { "no": 9, "nama": "Elnino Raffaza Arif" },
+        { "no": 10, "nama": "Farrell Alvaronizam" },
+        { "no": 11, "nama": "Hafiz Prima Cendekia" },
+        { "no": 12, "nama": "Khaliza Meidina Balqis R" },
+        { "no": 13, "nama": "Maryam Syaheera Harumi" },
+        { "no": 14, "nama": "Muhammad Pramudya Pratama" },
+        { "no": 15, "nama": "Nai Agatha Ramadhani" },
+        { "no": 16, "nama": "Nasha sabria azkayra" },
+        { "no": 17, "nama": "Nayla Muazara Ulfa Muta Aaliy" },
+        { "no": 18, "nama": "Rafif Fathurrahman" },
+        { "no": 19, "nama": "Rayyan Igo Pamungkas" },
+        { "no": 20, "nama": "Shafana Vallerie Nugroho" },
+        { "no": 21, "nama": "Syahdan Dzaki Altaff" },
+        { "no": 22, "nama": "Umar Abdul Aziz Lubis" },
+        { "no": 23, "nama": "Zafran Abrisam Maulana Haqqi" }
+      ]
     };
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -624,7 +925,6 @@
         });
     }
 
-    // HITUNG DINAMIS TOTAL PERTEMUAN KELAS
     function getClassTotalMeetings() {
       const classMeetingsMap = {};
       rawDataStore.forEach(r => {
@@ -636,12 +936,10 @@
       return classMeetingsMap;
     }
 
-    // GABUNGKAN DATA MASTER SISWA, PRESENSI & NILAI SISWA
     function getMergedRekapData() {
       const mergedMap = {};
       const classMeetingsMap = getClassTotalMeetings();
 
-      // 1. Inisialisasi Master Siswa
       Object.keys(masterSiswa).forEach(kelasKey => {
         masterSiswa[kelasKey].forEach(s => {
           const key = `${kelasKey}_${s.nama}`;
@@ -664,7 +962,6 @@
         });
       });
 
-      // 2. Olah Log Absensi
       rawAbsensiData.forEach(r => {
         const key = `${r["Kelas"]}_${r["Nama Siswa"]}`;
         if (!mergedMap[key]) {
@@ -677,7 +974,6 @@
         else if (st === "alpa") mergedMap[key].alpa++;
       });
 
-      // 3. Olah Log Nilai
       rawNilaiData.forEach(r => {
         const key = `${r["Kelas"]}_${r["Nama Siswa"]}`;
         if (!mergedMap[key]) {
@@ -700,7 +996,6 @@
 
       const allStudents = getMergedRekapData();
 
-      // Render Absensi
       const absTbody = document.getElementById("rekapAbsensiTbody");
       absTbody.innerHTML = "";
       let absRows = allStudents.filter(item => {
@@ -713,11 +1008,8 @@
         absTbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Tidak ada data absensi ditemukan.</td></tr>';
       } else {
         absRows.forEach(item => {
-          // TOTAL PERTEMUAN TERJADWAL / TERCATAT
           const totalLogged = item.hadir + item.izin + item.sakit + item.alpa;
           const totalAcuan = Math.max(totalLogged, item.totalKelasPertemuan, 1);
-          
-          // RUMUS PERSENTASE PRESISI
           const pct = Math.round((item.hadir / totalAcuan) * 100);
 
           const tr = document.createElement("tr");
@@ -736,7 +1028,6 @@
         });
       }
 
-      // Render Nilai
       const nilaiTbody = document.getElementById("rekapNilaiTbody");
       nilaiTbody.innerHTML = "";
       let nilRows = allStudents.filter(item => {
@@ -772,7 +1063,6 @@
       }
     }
 
-    // CETAK PDF 100% PERSENTASE HADIR PRESISI
     function generatePDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('l', 'mm', 'a4');
