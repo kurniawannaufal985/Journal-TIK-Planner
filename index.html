@@ -70,8 +70,8 @@
 
     <div class="p-4 border-t border-slate-800">
       <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 flex items-center space-x-2.5">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-        <span class="text-xs text-slate-300 font-medium truncate">Sheets Connected</span>
+        <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse shrink-0"></span>
+        <span class="text-xs text-slate-300 font-medium truncate">Stand-Alone Mode</span>
       </div>
     </div>
   </aside>
@@ -96,11 +96,6 @@
           <i data-lucide="clock" class="w-4 h-4 text-amber-600"></i>
           <span id="headerLiveTime" class="text-xs font-semibold text-slate-800">00:00:00 WIB</span>
         </div>
-
-        <button onclick="fetchSchedule()" class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-          <span class="hidden lg:inline">Refresh</span>
-        </button>
       </div>
     </header>
 
@@ -119,18 +114,18 @@
           </div>
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
             <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><i data-lucide="check-circle-2" class="w-6 h-6"></i></div>
-            <div><p class="text-xs font-medium text-slate-500">Status Sync</p><h3 class="text-sm font-bold text-emerald-600">Otomatis</h3></div>
+            <div><p class="text-xs font-medium text-slate-500">Status Sistem</p><h3 class="text-sm font-bold text-blue-600">Lokal / Siap</h3></div>
           </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
           <h3 class="font-bold text-slate-800 text-base">Tambah Pertemuan Baru</h3>
-          <form id="classForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <form id="classForm" onsubmit="addSchedule(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <input type="text" id="pertemuan" placeholder="Pertemuan (Contoh: 07)" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
             <input type="text" id="kelas" placeholder="Nama Kelas (Kelas-04)" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
             <input type="text" id="jenisKelas" placeholder="Jenis (Kelas-04-A)" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
             <input type="date" id="tanggal" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
-            <button type="submit" id="btnSubmit" class="sm:col-span-2 lg:col-span-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all">Simpan Jadwal Ke Sheet</button>
+            <button type="submit" id="btnSubmit" class="sm:col-span-2 lg:col-span-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all">Simpan Jadwal</button>
           </form>
         </div>
       </section>
@@ -230,7 +225,7 @@
 
           <button onclick="submitAbsensi()" id="btnSaveAbsensi" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition-all flex justify-center items-center space-x-2">
             <i data-lucide="save" class="w-5 h-5"></i>
-            <span>Simpan Absensi Ke Sheet "Absensi"</span>
+            <span>Simpan Absensi</span>
           </button>
         </div>
       </section>
@@ -242,7 +237,7 @@
             <div class="p-2 bg-amber-50 text-amber-600 rounded-xl"><i data-lucide="award" class="w-6 h-6"></i></div>
             <div>
               <h3 class="font-bold text-slate-800 text-lg">Input Nilai Praktik & Sikap Siswa</h3>
-              <p class="text-xs text-slate-500">Jumlah dan Nilai Sebenarnya (Rata-Rata) dihitung otomatis secara live</p>
+              <p class="text-xs text-slate-500">Jumlah dan Nilai Sebenarnya (Rata-Rata) dihitung otomatis secara konsisten</p>
             </div>
           </div>
 
@@ -303,7 +298,7 @@
 
           <button onclick="submitNilai()" id="btnSaveNilai" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl shadow-md transition-all flex justify-center items-center space-x-2">
             <i data-lucide="save" class="w-5 h-5"></i>
-            <span>Simpan Nilai Ke Sheet "Nilai_Siswa"</span>
+            <span>Simpan Nilai</span>
           </button>
         </div>
       </section>
@@ -321,7 +316,7 @@
             </div>
             
             <div class="flex items-center space-x-2">
-              <button onclick="loadRekapData()" class="px-4 py-2 bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 font-semibold rounded-xl text-xs flex items-center space-x-1.5 transition-all">
+              <button onclick="renderRekapTables()" class="px-4 py-2 bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 font-semibold rounded-xl text-xs flex items-center space-x-1.5 transition-all">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                 <span>Muat Rekap</span>
               </button>
@@ -386,7 +381,7 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-sm" id="rekapAbsensiTbody">
-                  <tr><td colspan="8" class="py-8 text-center text-slate-400">Klik "Muat Rekap" untuk memuat data.</td></tr>
+                  <tr><td colspan="8" class="py-8 text-center text-slate-400">Belum ada data absensi.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -413,7 +408,7 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-sm" id="rekapNilaiTbody">
-                  <tr><td colspan="8" class="py-8 text-center text-slate-400">Klik "Muat Rekap" untuk memuat data.</td></tr>
+                  <tr><td colspan="8" class="py-8 text-center text-slate-400">Belum ada data nilai.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -426,7 +421,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdSYDIlb1biC2u9zGkt8Fd8pgNkbMBPA_VkPzLy84Ao8-UOAEjX1n2gcYLNSnAigVsBg/exec";
+    // Data disimpan secara lokal di memori Javascript
     let rawDataStore = [];
     let rawAbsensiData = [];
     let rawNilaiData = [];
@@ -508,7 +503,7 @@
         { "no": 21, "nama": "Negara Adhya Prananta Harahap" },
         { "no": 22, "nama": "Qiana Naira Shaliha" },
         { "no": 23, "nama": "Rajendra Alim Ariyani" },
-        { "no": 24, "nama": "Restuandaru" },
+        { "no": 24, "nama": "Restuandaru" }
       ],
       "4D": [
         { "no": 1, "nama": "Abqari Khafid Sumanjaya" },
@@ -751,7 +746,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       lucide.createIcons();
-      fetchSchedule();
+      renderTable(rawDataStore);
       switchTab('dashboard');
       updateLiveClock();
       setInterval(updateLiveClock, 1000);
@@ -811,7 +806,7 @@
         document.getElementById('pageRekap').classList.remove('hidden');
         document.getElementById('navRekap').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm bg-blue-600 text-white transition-all";
         document.getElementById('pageTitle').innerText = "Rekapitulasi Absensi & Nilai";
-        loadRekapData();
+        renderRekapTables();
       }
     }
 
@@ -891,39 +886,85 @@
     }
 
     function calculateRowNilai(rowId) {
-      const p1 = parseFloat(document.getElementById(`p1_${rowId}`).value) || 0;
-      const p2 = parseFloat(document.getElementById(`p2_${rowId}`).value) || 0;
-      const sikap = parseFloat(document.getElementById(`sikap_${rowId}`).value) || 0;
+      const valP1 = document.getElementById(`p1_${rowId}`).value;
+      const valP2 = document.getElementById(`p2_${rowId}`).value;
+      const valSikap = document.getElementById(`sikap_${rowId}`).value;
+
+      const p1 = parseFloat(valP1) || 0;
+      const p2 = parseFloat(valP2) || 0;
+      const sikap = parseFloat(valSikap) || 0;
 
       const total = p1 + p2 + sikap;
-      let count = 0;
-      if (document.getElementById(`p1_${rowId}`).value !== "") count++;
-      if (document.getElementById(`p2_${rowId}`).value !== "") count++;
-      if (document.getElementById(`sikap_${rowId}`).value !== "") count++;
 
-      const avg = count > 0 ? (total / count).toFixed(2) : "0.00";
+      let validComponentsCount = 0;
+      if (valP1 !== "" && p1 > 0) validComponentsCount++;
+      if (valP2 !== "" && p2 > 0) validComponentsCount++;
+      if (valSikap !== "" && sikap > 0) validComponentsCount++;
 
-      document.getElementById(`total_${rowId}`).innerText = total;
+      let avg = "0.00";
+      if (validComponentsCount > 0) {
+        avg = (total / validComponentsCount).toFixed(2);
+      }
+
+      document.getElementById(`total_${rowId}`).innerText = total % 1 === 0 ? total : total.toFixed(1);
       document.getElementById(`avg_${rowId}`).innerText = avg;
     }
 
-    function loadRekapData() {
-      document.getElementById("rekapAbsensiTbody").innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Memuat data absensi...</td></tr>';
-      document.getElementById("rekapNilaiTbody").innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Memuat data nilai...</td></tr>';
+    function addSchedule(event) {
+      event.preventDefault();
+      const pertemuan = document.getElementById("pertemuan").value;
+      const kelas = document.getElementById("kelas").value;
+      const jenisKelas = document.getElementById("jenisKelas").value;
+      const tanggal = document.getElementById("tanggal").value;
 
-      fetch(`${SCRIPT_URL}?action=getAbsensi`)
-        .then(res => res.json())
-        .then(data => {
-          rawAbsensiData = data;
-          renderRekapTables();
-        });
+      rawDataStore.push({ Pertemuan: pertemuan, Kelas: kelas, "Jenis Kelas": jenisKelas, Tanggal: tanggal });
+      
+      document.getElementById("classForm").reset();
+      renderTable(rawDataStore);
+      document.getElementById("statTotal").innerText = rawDataStore.length;
+      document.getElementById("statKelas").innerText = new Set(rawDataStore.map(d => d["Kelas"])).size;
+      alert("Pertemuan berhasil ditambahkan secara lokal!");
+    }
 
-      fetch(`${SCRIPT_URL}?action=getNilai`)
-        .then(res => res.json())
-        .then(data => {
-          rawNilaiData = data;
-          renderRekapTables();
-        });
+    function renderTable(data) {
+      const tbody = document.querySelector("#dataTable tbody");
+      tbody.innerHTML = "";
+      if(data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400">Belum ada pertemuan ditambahkan.</td></tr>';
+        return;
+      }
+      data.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="py-4 px-6 font-semibold">${row["Pertemuan"] || "-"}</td>
+          <td class="py-4 px-6">${row["Kelas"] || "-"}</td>
+          <td class="py-4 px-6"><span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">${row["Jenis Kelas"] || "-"}</span></td>
+          <td class="py-4 px-6">${formatIndonesianDate(row["Tanggal"])}</td>
+          <td class="py-4 px-6 text-center">
+            <button onclick="deleteRow(${index})" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function deleteRow(index) {
+      if (!confirm("Hapus baris jadwal ini?")) return;
+      rawDataStore.splice(index, 1);
+      renderTable(rawDataStore);
+      document.getElementById("statTotal").innerText = rawDataStore.length;
+      document.getElementById("statKelas").innerText = new Set(rawDataStore.map(d => d["Kelas"])).size;
+    }
+
+    function filterTable() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = rawDataStore.filter(row => 
+        (row["Pertemuan"] && row["Pertemuan"].toLowerCase().includes(query)) ||
+        (row["Kelas"] && row["Kelas"].toLowerCase().includes(query)) ||
+        (row["Jenis Kelas"] && row["Jenis Kelas"].toLowerCase().includes(query))
+      );
+      renderTable(filtered);
     }
 
     function getClassTotalMeetings() {
@@ -956,9 +997,9 @@
             p1Sum: 0,
             p2Sum: 0,
             sikapSum: 0,
-            totalSum: 0,
-            avgSum: 0,
-            countNilai: 0
+            countP1: 0,
+            countP2: 0,
+            countSikap: 0
           };
         });
       });
@@ -966,7 +1007,7 @@
       rawAbsensiData.forEach(r => {
         const key = `${r["Kelas"]}_${r["Nama Siswa"]}`;
         if (!mergedMap[key]) {
-          mergedMap[key] = { kelas: r["Kelas"], no: r["No Absen"] || "-", nama: r["Nama Siswa"], hadir: 0, izin: 0, sakit: 0, alpa: 0, totalKelasPertemuan: 1, p1Sum: 0, p2Sum: 0, sikapSum: 0, totalSum: 0, avgSum: 0, countNilai: 0 };
+          mergedMap[key] = { kelas: r["Kelas"], no: r["No Absen"] || "-", nama: r["Nama Siswa"], hadir: 0, izin: 0, sakit: 0, alpa: 0, totalKelasPertemuan: 1, p1Sum: 0, p2Sum: 0, sikapSum: 0, countP1: 0, countP2: 0, countSikap: 0 };
         }
         const st = (r["Status Kehadiran"] || r["Status"] || "").toLowerCase();
         if (st === "hadir") mergedMap[key].hadir++;
@@ -978,14 +1019,16 @@
       rawNilaiData.forEach(r => {
         const key = `${r["Kelas"]}_${r["Nama Siswa"]}`;
         if (!mergedMap[key]) {
-          mergedMap[key] = { kelas: r["Kelas"], no: r["No Absen"] || "-", nama: r["Nama Siswa"], hadir: 0, izin: 0, sakit: 0, alpa: 0, totalKelasPertemuan: 1, p1Sum: 0, p2Sum: 0, sikapSum: 0, totalSum: 0, avgSum: 0, countNilai: 0 };
+          mergedMap[key] = { kelas: r["Kelas"], no: r["No Absen"] || "-", nama: r["Nama Siswa"], hadir: 0, izin: 0, sakit: 0, alpa: 0, totalKelasPertemuan: 1, p1Sum: 0, p2Sum: 0, sikapSum: 0, countP1: 0, countP2: 0, countSikap: 0 };
         }
-        mergedMap[key].p1Sum += parseFloat(r["Nilai Praktik 1"] || 0);
-        mergedMap[key].p2Sum += parseFloat(r["Nilai Praktik 2"] || 0);
-        mergedMap[key].sikapSum += parseFloat(r["Nilai Sikap"] || 0);
-        mergedMap[key].totalSum += parseFloat(r["Jumlah Nilai"] || 0);
-        mergedMap[key].avgSum += parseFloat(r["Nilai Rata-rata"] || 0);
-        mergedMap[key].countNilai++;
+        
+        const p1Val = parseFloat(r["Nilai Praktik 1"] || r["Praktik 1"] || 0);
+        const p2Val = parseFloat(r["Nilai Praktik 2"] || r["Praktik 2"] || 0);
+        const sikapVal = parseFloat(r["Nilai Sikap"] || r["Sikap"] || 0);
+
+        if (p1Val > 0) { mergedMap[key].p1Sum += p1Val; mergedMap[key].countP1++; }
+        if (p2Val > 0) { mergedMap[key].p2Sum += p2Val; mergedMap[key].countP2++; }
+        if (sikapVal > 0) { mergedMap[key].sikapSum += sikapVal; mergedMap[key].countSikap++; }
       });
 
       return Object.values(mergedMap);
@@ -1041,11 +1084,18 @@
         nilaiTbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Tidak ada data nilai ditemukan.</td></tr>';
       } else {
         nilRows.forEach(item => {
-          const avgP1 = item.countNilai > 0 ? (item.p1Sum / item.countNilai).toFixed(1) : "0.0";
-          const avgP2 = item.countNilai > 0 ? (item.p2Sum / item.countNilai).toFixed(1) : "0.0";
-          const avgSikap = item.countNilai > 0 ? (item.sikapSum / item.countNilai).toFixed(1) : "0.0";
-          const avgTotal = item.countNilai > 0 ? (item.totalSum / item.countNilai).toFixed(1) : "0.0";
-          const finalAvg = item.countNilai > 0 ? (item.avgSum / item.countNilai).toFixed(2) : "0.00";
+          const avgP1 = item.countP1 > 0 ? (item.p1Sum / item.countP1) : 0;
+          const avgP2 = item.countP2 > 0 ? (item.p2Sum / item.countP2) : 0;
+          const avgSikap = item.countSikap > 0 ? (item.sikapSum / item.countSikap) : 0;
+
+          const totalNilai = avgP1 + avgP2 + avgSikap;
+          
+          let divisor = 0;
+          if (avgP1 > 0) divisor++;
+          if (avgP2 > 0) divisor++;
+          if (avgSikap > 0) divisor++;
+
+          const finalAvg = divisor > 0 ? (totalNilai / divisor).toFixed(2) : "0.00";
 
           const tr = document.createElement("tr");
           tr.className = "hover:bg-slate-50";
@@ -1053,10 +1103,10 @@
             <td class="py-3 px-4 font-semibold text-blue-700">${item.kelas}</td>
             <td class="py-3 px-4 text-center font-bold text-slate-600">${item.no}</td>
             <td class="py-3 px-4 font-medium">${item.nama}</td>
-            <td class="py-3 px-4 text-center">${avgP1}</td>
-            <td class="py-3 px-4 text-center">${avgP2}</td>
-            <td class="py-3 px-4 text-center">${avgSikap}</td>
-            <td class="py-3 px-4 text-center font-bold text-slate-700">${avgTotal}</td>
+            <td class="py-3 px-4 text-center">${avgP1 > 0 ? avgP1.toFixed(1) : "0.0"}</td>
+            <td class="py-3 px-4 text-center">${avgP2 > 0 ? avgP2.toFixed(1) : "0.0"}</td>
+            <td class="py-3 px-4 text-center">${avgSikap > 0 ? avgSikap.toFixed(1) : "0.0"}</td>
+            <td class="py-3 px-4 text-center font-bold text-slate-700">${totalNilai.toFixed(1)}</td>
             <td class="py-3 px-4 text-center font-bold bg-amber-50 text-amber-800">${finalAvg}</td>
           `;
           nilaiTbody.appendChild(tr);
@@ -1095,10 +1145,17 @@
         const totalAcuan = Math.max(totalLogged, item.totalKelasPertemuan, 1);
         const pctHadir = Math.round((item.hadir / totalAcuan) * 100) + "%";
 
-        const avgP1 = item.countNilai > 0 ? (item.p1Sum / item.countNilai).toFixed(1) : "0.0";
-        const avgP2 = item.countNilai > 0 ? (item.p2Sum / item.countNilai).toFixed(1) : "0.0";
-        const avgTotal = item.countNilai > 0 ? (item.totalSum / item.countNilai).toFixed(1) : "0.0";
-        const finalAvg = item.countNilai > 0 ? (item.avgSum / item.countNilai).toFixed(2) : "0.00";
+        const avgP1 = item.countP1 > 0 ? (item.p1Sum / item.countP1) : 0;
+        const avgP2 = item.countP2 > 0 ? (item.p2Sum / item.countP2) : 0;
+        const avgSikap = item.countSikap > 0 ? (item.sikapSum / item.countSikap) : 0;
+
+        const totalNilai = avgP1 + avgP2 + avgSikap;
+        let divisor = 0;
+        if (avgP1 > 0) divisor++;
+        if (avgP2 > 0) divisor++;
+        if (avgSikap > 0) divisor++;
+
+        const finalAvg = divisor > 0 ? (totalNilai / divisor).toFixed(2) : "0.00";
 
         return [
           index + 1,
@@ -1107,9 +1164,9 @@
           item.nama,
           `${item.hadir} Hadir`,
           pctHadir,
-          avgP1,
-          avgP2,
-          avgTotal,
+          avgP1 > 0 ? avgP1.toFixed(1) : "0.0",
+          avgP2 > 0 ? avgP2.toFixed(1) : "0.0",
+          totalNilai.toFixed(1),
           finalAvg
         ];
       });
@@ -1150,40 +1207,24 @@
 
       const formattedDate = formatIndonesianDate(rawDate);
       const listSiswa = masterSiswa[kelasKey] || [];
-      const records = [];
 
       listSiswa.forEach(s => {
         const rowId = `abs_${kelasKey}_${s.no}`;
         const statusEl = document.querySelector(`input[name="status_${rowId}"]:checked`);
         const ketEl = document.getElementById(`ket_${rowId}`);
 
-        records.push({
-          tanggal: formattedDate,
-          pertemuan: pertemuan,
-          kelas: kelasKey,
-          noAbsen: s.no,
-          namaSiswa: s.nama,
-          status: statusEl ? statusEl.value : "Hadir",
-          keterangan: ketEl ? ketEl.value : ""
+        rawAbsensiData.push({
+          "Tanggal": formattedDate,
+          "Pertemuan": pertemuan,
+          "Kelas": kelasKey,
+          "No Absen": s.no,
+          "Nama Siswa": s.nama,
+          "Status Kehadiran": statusEl ? statusEl.value : "Hadir",
+          "Keterangan": ketEl ? ketEl.value : ""
         });
       });
 
-      const btn = document.getElementById("btnSaveAbsensi");
-      btn.disabled = true;
-      btn.innerText = "Menyimpan Absensi...";
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "saveAbsensi", records: records })
-      })
-      .then(() => {
-        alert(`Absensi Kelas ${kelasKey} berhasil disimpan ke Sheet 'Absensi'!`);
-        btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="save" class="w-5 h-5"></i><span>Simpan Absensi Ke Sheet "Absensi"</span>`;
-        lucide.createIcons();
-      });
+      alert(`Absensi Kelas ${kelasKey} berhasil disimpan!`);
     }
 
     function submitNilai() {
@@ -1198,7 +1239,6 @@
 
       const formattedDate = formatIndonesianDate(rawDate);
       const listSiswa = masterSiswa[kelasKey] || [];
-      const records = [];
 
       listSiswa.forEach(s => {
         const rowId = `nilai_${kelasKey}_${s.no}`;
@@ -1208,76 +1248,21 @@
         const total = document.getElementById(`total_${rowId}`).innerText;
         const avg = document.getElementById(`avg_${rowId}`).innerText;
 
-        records.push({
-          tanggal: formattedDate,
-          pertemuan: pertemuan,
-          kelas: kelasKey,
-          noAbsen: s.no,
-          namaSiswa: s.nama,
-          praktik1: p1,
-          praktik2: p2,
-          sikap: sikap,
-          jumlahNilai: total,
-          rataRata: avg
+        rawNilaiData.push({
+          "Tanggal": formattedDate,
+          "Pertemuan": pertemuan,
+          "Kelas": kelasKey,
+          "No Absen": s.no,
+          "Nama Siswa": s.nama,
+          "Nilai Praktik 1": p1,
+          "Nilai Praktik 2": p2,
+          "Nilai Sikap": sikap,
+          "Jumlah Nilai": total,
+          "Nilai Rata-rata": avg
         });
       });
 
-      const btn = document.getElementById("btnSaveNilai");
-      btn.disabled = true;
-      btn.innerText = "Menyimpan Nilai...";
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "saveNilai", records: records })
-      })
-      .then(() => {
-        alert(`Nilai Kelas ${kelasKey} berhasil disimpan ke Sheet 'Nilai_Siswa'!`);
-        btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="save" class="w-5 h-5"></i><span>Simpan Nilai Ke Sheet "Nilai_Siswa"</span>`;
-        lucide.createIcons();
-      });
-    }
-
-    function fetchSchedule() {
-      fetch(SCRIPT_URL)
-        .then(res => res.json())
-        .then(data => {
-          rawDataStore = data;
-          renderTable(data);
-          document.getElementById("statTotal").innerText = data.length;
-          document.getElementById("statKelas").innerText = new Set(data.map(d => d["Kelas"])).size;
-        });
-    }
-
-    function renderTable(data) {
-      const tbody = document.querySelector("#dataTable tbody");
-      tbody.innerHTML = "";
-      data.forEach((row, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="py-4 px-6 font-semibold">${row["Pertemuan"] || row["TT Pertemuan"] || "-"}</td>
-          <td class="py-4 px-6">${row["Kelas"] || "-"}</td>
-          <td class="py-4 px-6"><span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">${row["Jenis Kelas"] || "-"}</span></td>
-          <td class="py-4 px-6">${formatIndonesianDate(row["Tanggal"])}</td>
-          <td class="py-4 px-6 text-center">
-            <button onclick="deleteRow(${row.rowIndex || index + 2})" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-      lucide.createIcons();
-    }
-
-    function deleteRow(rowIndex) {
-      if (!confirm("Hapus baris jadwal ini?")) return;
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "delete", rowIndex: rowIndex })
-      }).then(() => setTimeout(fetchSchedule, 1500));
+      alert(`Nilai Kelas ${kelasKey} berhasil disimpan!`);
     }
   </script>
 </body>
