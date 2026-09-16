@@ -1,1271 +1,1006 @@
-Untuk jumlah nilai itu bisa di ganti jadi Nilai akhir yang di ambil dari nilai praktik 1 dan praktik 2 dengan rumus pakai ambil nilai tertinggi... Dan nilai rata-rata itu di hilangkan dan di sesuaikan juga di rekap absensi dan nilai dan juga di cetak pdf dan desain tolong di ganti lagi biar ga keliatan kalo ini buatan Ai atau di bantu Ai
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Manajemen Jadwal, Absensi & Nilai</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- Library Cetak PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Absensi Siswa TP 2026/2027</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <style> 
-    * { font-family: 'Lexend', sans-serif !important; }
-    optgroup { font-weight: 700 !important; }
-  </style>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+            .shadow-card {
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+        }
+        .print-only {
+            display: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 h-screen overflow-hidden flex flex-col md:flex-row">
-
-  <!-- Mobile Overlay -->
-  <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden transition-opacity"></div>
-
-  <!-- Sidebar Kiri -->
-  <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col justify-between transition-all duration-300 shadow-xl shrink-0 h-full">
-    <div>
-      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="p-2 bg-blue-600 rounded-xl">
-            <i data-lucide="graduation-cap" class="w-6 h-6 text-white"></i>
-          </div>
-          <div>
-            <h1 class="font-bold text-base leading-tight">Portal Kelas</h1>
-            <p class="text-[10px] text-slate-400">Absensi & Penilaian</p>
-          </div>
-        </div>
-        <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-      </div>
-
-      <nav class="p-4 space-y-1.5">
-        <button id="navDashboard" onclick="switchTab('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 transition-all">
-          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-          <span>Dashboard & Input</span>
-        </button>
-
-        <button id="navJadwal" onclick="switchTab('jadwal')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 transition-all">
-          <i data-lucide="calendar-range" class="w-5 h-5"></i>
-          <span>Daftar Jadwal Kelas</span>
-        </button>
-
-        <button id="navAbsensi" onclick="switchTab('absensi')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 transition-all">
-          <i data-lucide="user-check" class="w-5 h-5"></i>
-          <span>Absensi Kelas</span>
-        </button>
-
-        <button id="navNilai" onclick="switchTab('nilai')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 transition-all">
-          <i data-lucide="award" class="w-5 h-5"></i>
-          <span>Input Nilai Praktik & Sikap</span>
-        </button>
-
-        <button id="navRekap" onclick="switchTab('rekap')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 transition-all">
-          <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-          <span>Rekap Absensi & Nilai</span>
-        </button>
-      </nav>
-    </div>
-
-    <div class="p-4 border-t border-slate-800">
-      <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 flex items-center space-x-2.5">
-        <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse shrink-0"></span>
-        <span class="text-xs text-slate-300 font-medium truncate">Stand-Alone Mode</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Area Kanan -->
-  <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
-    
-    <!-- Top Header -->
-    <header class="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm shrink-0">
-      <div class="flex items-center space-x-3">
-        <button onclick="toggleSidebar()" class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm active:scale-95 transition-all" title="Toggle Sidebar">
-          <i data-lucide="menu" class="w-6 h-6"></i>
-        </button>
-        <h2 id="pageTitle" class="text-base sm:text-lg font-bold text-slate-800">Dashboard & Input Kelas</h2>
-      </div>
-
-      <div class="flex items-center space-x-3">
-        <div class="hidden sm:flex items-center space-x-2 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 shadow-sm">
-          <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
-          <span id="headerLiveDate">Minggu, 30 Agustus 2026</span>
-          <span class="text-slate-300">|</span>
-          <i data-lucide="clock" class="w-4 h-4 text-amber-600"></i>
-          <span id="headerLiveTime" class="text-xs font-semibold text-slate-800">00:00:00 WIB</span>
-        </div>
-      </div>
-    </header>
-
-    <main class="p-4 sm:p-6 lg:p-8 flex-1">
-      
-      <!-- PAGE 1: DASHBOARD -->
-      <section id="pageDashboard" class="space-y-8">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
-            <div class="p-3 bg-blue-50 text-blue-600 rounded-xl"><i data-lucide="list-checks" class="w-6 h-6"></i></div>
-            <div><p class="text-xs font-medium text-slate-500">Total Pertemuan</p><h3 id="statTotal" class="text-2xl font-bold text-slate-800">0</h3></div>
-          </div>
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
-            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><i data-lucide="graduation-cap" class="w-6 h-6"></i></div>
-            <div><p class="text-xs font-medium text-slate-500">Kelas Aktif</p><h3 id="statKelas" class="text-2xl font-bold text-slate-800">0</h3></div>
-          </div>
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
-            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><i data-lucide="check-circle-2" class="w-6 h-6"></i></div>
-            <div><p class="text-xs font-medium text-slate-500">Status Sistem</p><h3 class="text-sm font-bold text-blue-600">Lokal / Siap</h3></div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-          <h3 class="font-bold text-slate-800 text-base">Tambah Pertemuan Baru</h3>
-          <form id="classForm" onsubmit="addSchedule(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <input type="text" id="pertemuan" placeholder="Pertemuan (Contoh: 07)" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
-            <input type="text" id="kelas" placeholder="Nama Kelas (Kelas-04)" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
-            <input type="text" id="jenisKelas" placeholder="Jenis (Kelas-04-A)" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
-            <input type="date" id="tanggal" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
-            <button type="submit" id="btnSubmit" class="sm:col-span-2 lg:col-span-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all">Simpan Jadwal</button>
-          </form>
-        </div>
-      </section>
-
-      <!-- PAGE 2: TABEL JADWAL -->
-      <section id="pageJadwal" class="hidden space-y-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-            <h3 class="font-bold text-slate-800 text-lg">Daftar Jadwal Pertemuan Kelas</h3>
-            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari..." class="px-4 py-2 border rounded-xl text-xs">
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left" id="dataTable">
-              <thead>
-                <tr class="bg-slate-100 text-xs font-bold uppercase text-slate-600">
-                  <th class="py-4 px-6">Pertemuan</th>
-                  <th class="py-4 px-6">Nama Kelas</th>
-                  <th class="py-4 px-6">Jenis Kelas</th>
-                  <th class="py-4 px-6">Tanggal Pelaksanaan</th>
-                  <th class="py-4 px-6 text-center">Aksi Hapus</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 text-sm"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- PAGE 3: ABSENSI SISWA -->
-      <section id="pageAbsensi" class="hidden space-y-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
-          <div class="flex items-center justify-between flex-wrap gap-4">
-            <div class="flex items-center space-x-3">
-              <div class="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><i data-lucide="user-check" class="w-6 h-6"></i></div>
-              <div>
-                <h3 class="font-bold text-slate-800 text-lg">Absensi Siswa Per Kelas</h3>
-                <p class="text-xs text-slate-500">Pilih 1 kelas untuk pengisian cepat tanpa scroll panjang</p>
-              </div>
-            </div>
-            <button onclick="setAllHadir()" class="px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 font-semibold rounded-xl text-xs flex items-center space-x-1.5 transition-all">
-              <i data-lucide="check-check" class="w-4 h-4"></i>
-              <span>Set Semua Hadir</span>
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Pelaksanaan</label>
-              <input type="date" id="absensiTanggal" class="w-full p-2.5 border rounded-xl text-sm bg-white">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Pertemuan Ke-</label>
-              <input type="text" id="absensiPertemuan" placeholder="Contoh: 05" class="w-full p-2.5 border rounded-xl text-sm bg-white">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Kelas</label>
-              <select id="absensiSelectKelas" onchange="generateAbsensiForm()" class="w-full p-2.5 border rounded-xl text-sm bg-white font-medium">
-                <option value="">-- Pilih Kelas --</option>
-                <optgroup label="Kelas 4">
-                  <option value="4A">Kelas 4A</option>
-                  <option value="4B">Kelas 4B</option>
-                  <option value="4C">Kelas 4C</option>
-                  <option value="4D">Kelas 4D</option>
-                  <option value="4E">Kelas 4E</option>
-                </optgroup>
-                <optgroup label="Kelas 5">
-                  <option value="5A">Kelas 5A</option>
-                  <option value="5B">Kelas 5B</option>
-                  <option value="5C">Kelas 5C</option>
-                  <option value="5D">Kelas 5D</option>
-                </optgroup>
-                <optgroup label="Kelas 6">
-                  <option value="6A">Kelas 6A</option>
-                  <option value="6B">Kelas 6B</option>
-                  <option value="6C">Kelas 6C</option>
-                  <option value="6D">Kelas 6D</option>
-                </optgroup>
-              </select>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto border border-slate-200 rounded-xl">
-            <table class="w-full text-left" id="absensiTable">
-              <thead>
-                <tr class="bg-slate-100 text-xs uppercase font-bold text-slate-600">
-                  <th class="py-3 px-4 text-center">No</th>
-                  <th class="py-3 px-4">Nama Siswa</th>
-                  <th class="py-3 px-4 text-center">Status Kehadiran</th>
-                  <th class="py-3 px-4">Keterangan</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 text-sm" id="absensiTbody">
-                <tr><td colspan="4" class="py-8 text-center text-slate-400">Pilih kelas di atas untuk memuat daftar siswa.</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <button onclick="submitAbsensi()" id="btnSaveAbsensi" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition-all flex justify-center items-center space-x-2">
-            <i data-lucide="save" class="w-5 h-5"></i>
-            <span>Simpan Absensi</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- PAGE 4: INPUT PENILAIAN -->
-      <section id="pageNilai" class="hidden space-y-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
-          <div class="flex items-center space-x-3">
-            <div class="p-2 bg-amber-50 text-amber-600 rounded-xl"><i data-lucide="award" class="w-6 h-6"></i></div>
-            <div>
-              <h3 class="font-bold text-slate-800 text-lg">Input Nilai Praktik & Sikap Siswa</h3>
-              <p class="text-xs text-slate-500">Jumlah dan Nilai Sebenarnya (Rata-Rata) dihitung otomatis secara konsisten</p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Evaluasi</label>
-              <input type="date" id="nilaiTanggal" class="w-full p-2.5 border rounded-xl text-sm bg-white">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Pertemuan Ke-</label>
-              <input type="text" id="nilaiPertemuan" placeholder="Contoh: 05" class="w-full p-2.5 border rounded-xl text-sm bg-white">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Kelas</label>
-              <select id="nilaiSelectKelas" onchange="generateNilaiForm()" class="w-full p-2.5 border rounded-xl text-sm bg-white font-medium">
-                <option value="">-- Pilih Kelas --</option>
-                <optgroup label="Kelas 4">
-                  <option value="4A">Kelas 4A</option>
-                  <option value="4B">Kelas 4B</option>
-                  <option value="4C">Kelas 4C</option>
-                  <option value="4D">Kelas 4D</option>
-                  <option value="4E">Kelas 4E</option>
-                </optgroup>
-                <optgroup label="Kelas 5">
-                  <option value="5A">Kelas 5A</option>
-                  <option value="5B">Kelas 5B</option>
-                  <option value="5C">Kelas 5C</option>
-                  <option value="5D">Kelas 5D</option>
-                </optgroup>
-                <optgroup label="Kelas 6">
-                  <option value="6A">Kelas 6A</option>
-                  <option value="6B">Kelas 6B</option>
-                  <option value="6C">Kelas 6C</option>
-                  <option value="6D">Kelas 6D</option>
-                </optgroup>
-              </select>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto border border-slate-200 rounded-xl">
-            <table class="w-full text-left" id="nilaiTable">
-              <thead>
-                <tr class="bg-slate-100 text-xs uppercase font-bold text-slate-600">
-                  <th class="py-3 px-4 text-center">No</th>
-                  <th class="py-3 px-4">Nama Siswa</th>
-                  <th class="py-3 px-4 text-center">Praktik 1</th>
-                  <th class="py-3 px-4 text-center">Praktik 2</th>
-                  <th class="py-3 px-4 text-center">Nilai Sikap</th>
-                  <th class="py-3 px-4 text-center">Jumlah Nilai</th>
-                  <th class="py-3 px-4 text-center bg-blue-50 text-blue-800">Nilai Rata-Rata (Sebenarnya)</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 text-sm" id="nilaiTbody">
-                <tr><td colspan="7" class="py-8 text-center text-slate-400">Pilih kelas di atas untuk memuat daftar siswa.</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <button onclick="submitNilai()" id="btnSaveNilai" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl shadow-md transition-all flex justify-center items-center space-x-2">
-            <i data-lucide="save" class="w-5 h-5"></i>
-            <span>Simpan Nilai</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- PAGE 5: REKAPITULASI & CETAK PDF -->
-      <section id="pageRekap" class="hidden space-y-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
-          <div class="flex items-center justify-between flex-wrap gap-4">
-            <div class="flex items-center space-x-3">
-              <div class="p-2 bg-purple-50 text-purple-600 rounded-xl"><i data-lucide="bar-chart-3" class="w-6 h-6"></i></div>
-              <div>
-                <h3 class="font-bold text-slate-800 text-lg">Rekapitulasi Absensi & Nilai</h3>
-                <p class="text-xs text-slate-500">Persentase Kehadiran dihitung akurat berdasarkan akumulasi total pertemuan</p>
-              </div>
-            </div>
-            
-            <div class="flex items-center space-x-2">
-              <button onclick="renderRekapTables()" class="px-4 py-2 bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 font-semibold rounded-xl text-xs flex items-center space-x-1.5 transition-all">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                <span>Muat Rekap</span>
-              </button>
-              
-              <button onclick="generatePDF()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-xs flex items-center space-x-1.5 shadow-md transition-all">
-                <i data-lucide="file-text" class="w-4 h-4"></i>
-                <span>Cetak PDF Rekapitulasi</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Kelas Rekap</label>
-              <select id="rekapFilterKelas" onchange="renderRekapTables()" class="w-full p-2.5 border rounded-xl text-sm bg-white font-medium">
-                <option value="">-- Semua Kelas --</option>
-                <optgroup label="Kelas 4">
-                  <option value="4A">Kelas 4A</option>
-                  <option value="4B">Kelas 4B</option>
-                  <option value="4C">Kelas 4C</option>
-                  <option value="4D">Kelas 4D</option>
-                  <option value="4E">Kelas 4E</option>
-                </optgroup>
-                <optgroup label="Kelas 5">
-                  <option value="5A">Kelas 5A</option>
-                  <option value="5B">Kelas 5B</option>
-                  <option value="5C">Kelas 5C</option>
-                  <option value="5D">Kelas 5D</option>
-                </optgroup>
-                <optgroup label="Kelas 6">
-                  <option value="6A">Kelas 6A</option>
-                  <option value="6B">Kelas 6B</option>
-                  <option value="6C">Kelas 6C</option>
-                  <option value="6D">Kelas 6D</option>
-                </optgroup>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Cari Nama Siswa</label>
-              <input type="text" id="rekapSearchNama" onkeyup="renderRekapTables()" placeholder="Ketik nama siswa..." class="w-full p-2.5 border rounded-xl text-sm bg-white">
-            </div>
-          </div>
-
-          <!-- TABEL 1: REKAP ABSENSI AKUMULASI -->
-          <div class="space-y-3">
-            <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-              <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
-              <span>Akumulasi Kehadiran Siswa</span>
-            </h4>
-            <div class="overflow-x-auto border border-slate-200 rounded-xl">
-              <table class="w-full text-left" id="rekapAbsensiTable">
-                <thead>
-                  <tr class="bg-slate-100 text-xs uppercase font-bold text-slate-600">
-                    <th class="py-3 px-4">Kelas</th>
-                    <th class="py-3 px-4 text-center">No Absen</th>
-                    <th class="py-3 px-4">Nama Siswa</th>
-                    <th class="py-3 px-4 text-center text-emerald-600">Hadir</th>
-                    <th class="py-3 px-4 text-center text-amber-600">Izin</th>
-                    <th class="py-3 px-4 text-center text-blue-600">Sakit</th>
-                    <th class="py-3 px-4 text-center text-rose-600">Alpa</th>
-                    <th class="py-3 px-4 text-center bg-blue-50 text-blue-800">% Kehadiran</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-sm" id="rekapAbsensiTbody">
-                  <tr><td colspan="8" class="py-8 text-center text-slate-400">Belum ada data absensi.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- TABEL 2: REKAP NILAI AKUMULASI -->
-          <div class="space-y-3 pt-4">
-            <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-              <i data-lucide="award" class="w-4 h-4 text-amber-600"></i>
-              <span>Akumulasi Nilai Siswa</span>
-            </h4>
-            <div class="overflow-x-auto border border-slate-200 rounded-xl">
-              <table class="w-full text-left" id="rekapNilaiTable">
-                <thead>
-                  <tr class="bg-slate-100 text-xs uppercase font-bold text-slate-600">
-                    <th class="py-3 px-4">Kelas</th>
-                    <th class="py-3 px-4 text-center">No Absen</th>
-                    <th class="py-3 px-4">Nama Siswa</th>
-                    <th class="py-3 px-4 text-center">Praktik 1</th>
-                    <th class="py-3 px-4 text-center">Praktik 2</th>
-                    <th class="py-3 px-4 text-center">Sikap</th>
-                    <th class="py-3 px-4 text-center">Total Nilai</th>
-                    <th class="py-3 px-4 text-center bg-amber-50 text-amber-800">Nilai Rata-Rata</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-sm" id="rekapNilaiTbody">
-                  <tr><td colspan="8" class="py-8 text-center text-slate-400">Belum ada data nilai.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <script>
-    // Data disimpan secara lokal di memori Javascript
-    let rawDataStore = [];
-    let rawAbsensiData = [];
-    let rawNilaiData = [];
-
-    const masterSiswa = {
-      "4A": [
-        { "no": 1, "nama": "Al Birru Raga Syahumpri" },
-        { "no": 2, "nama": "Arsenio Ananda Abqori" },
-        { "no": 3, "nama": "Azzam Al Fattah Kurniawan" },
-        { "no": 4, "nama": "Fadhlan Erdogan" },
-        { "no": 5, "nama": "Gendis Shabrina Nuralifa" },
-        { "no": 6, "nama": "Ghaisan Array Pramana" },
-        { "no": 7, "nama": "Ghina Inayah" },
-        { "no": 8, "nama": "Hafidza Ahna Farihah" },
-        { "no": 9, "nama": "Hafiqa Anindita Husna" },
-        { "no": 10, "nama": "Hana Izzatunnisa" },
-        { "no": 11, "nama": "Ibrahim Athallah Irvani" },
-        { "no": 12, "nama": "Jehan Almahyra Mecca" },
-        { "no": 13, "nama": "Karina Naladeva Almaarief" },
-        { "no": 14, "nama": "Khadijah Samila" },
-        { "no": 15, "nama": "Mahreen Naima Almedina" },
-        { "no": 16, "nama": "Mishal Azfer Fathian" },
-        { "no": 17, "nama": "Muhammad Rafif Alfarezi" },
-        { "no": 18, "nama": "Rahardian Kael Setiawan" },
-        { "no": 19, "nama": "Safaira Putri Kusuma" },
-        { "no": 20, "nama": "Shanika Umaiza" },
-        { "no": 21, "nama": "Surga Faiha Shaliha" },
-        { "no": 22, "nama": "Syafiqah Firzanah Althafunnisa" },
-        { "no": 23, "nama": "Umar Karim Fatahillah" },
-        { "no": 24, "nama": "Zidane Alfatih Raqila Shahbaz" }
-      ],
-      "4B": [
-        { "no": 1, "nama": "Abimanyu Indradewa" },
-        { "no": 2, "nama": "Abrar Syafiq Ramadan" },
-        { "no": 3, "nama": "Althaf Figo Kurniawan" },
-        { "no": 4, "nama": "Alya Nidaul Karimah" },
-        { "no": 5, "nama": "Auliya Az-Zahrah" },
-        { "no": 6, "nama": "Azzalia Salsabila Queensha Yudira" },
-        { "no": 7, "nama": "Daffa Alif Alfarizqi" },
-        { "no": 8, "nama": "Fidelio Shaquile Gavyn Nainggolan" },
-        { "no": 9, "nama": "Guinandra Fawish Aiden" },
-        { "no": 10, "nama": "Hamizan Althaff Lukiawan" },
-        { "no": 11, "nama": "Hanifah Ghayda Muhtasyam" },
-        { "no": 12, "nama": "Hanna Siti Maryam" },
-        { "no": 13, "nama": "Kayyisa Azkadina" },
-        { "no": 14, "nama": "Kiano Alrafaeyza Harnuanto" },
-        { "no": 15, "nama": "Laode Alvaronizam Akmar" },
-        { "no": 16, "nama": "Mikayla Heaserra Anaketio" },
-        { "no": 17, "nama": "Muhammad Rashid As-Shiddiq" },
-        { "no": 18, "nama": "Naura Jihan Azzahra" },
-        { "no": 19, "nama": "Nazila Andhisa Mahveen" },
-        { "no": 20, "nama": "Nur Haidar Almairi Tsaqib" },
-        { "no": 21, "nama": "Rayyan Atalla Zavier" },
-        { "no": 22, "nama": "Shadia Tsuraya Nugroho" },
-        { "no": 23, "nama": "Sofia Elmira Azkadina" },
-        { "no": 24, "nama": "Yukeiko Kamila Putri Kelana" }
-      ],
-      "4C": [
-        { "no": 1, "nama": "Abdurrobbi Attaqi Haneeyyah" },
-        { "no": 2, "nama": "Ahmad Amru Kintoko" },
-        { "no": 3, "nama": "Alesha Putri Chairunnisa" },
-        { "no": 4, "nama": "Aliyahayu Kayshila Pangayuh" },
-        { "no": 5, "nama": "Almeera Rainy Khumaira" },
-        { "no": 6, "nama": "Alsyamra Rasezha Shihan" },
-        { "no": 7, "nama": "Artanabil Faeyza Yazid Abbasy" },
-        { "no": 8, "nama": "Danish Asyraf Fahreza" },
-        { "no": 9, "nama": "Eldira Rahma Hayuningtyas" },
-        { "no": 10, "nama": "Farsya Zerina Mahreen Rusthady" },
-        { "no": 11, "nama": "Halima Nahda Ashadia" },
-        { "no": 12, "nama": "Hasya Aulia Az Zahra" },
-        { "no": 13, "nama": "Ibrahim Arkan Al Farisi" },
-        { "no": 14, "nama": "Kalyana Adzkiya Vivaldy" },
-        { "no": 15, "nama": "Lubna Luvena Maysun" },
-        { "no": 16, "nama": "Maryam Hamalatul Bayan" },
-        { "no": 17, "nama": "Muhammad Althaf Aulian" },
-        { "no": 18, "nama": "Muhammad Fahry Al Zaidhan" },
-        { "no": 19, "nama": "Muhammad Hanif Kamil" },
-        { "no": 20, "nama": "Muhammad Kholif Al Hafidz" },
-        { "no": 21, "nama": "Negara Adhya Prananta Harahap" },
-        { "no": 22, "nama": "Qiana Naira Shaliha" },
-        { "no": 23, "nama": "Rajendra Alim Ariyani" },
-        { "no": 24, "nama": "Restuandaru" }
-      ],
-      "4D": [
-        { "no": 1, "nama": "Abqari Khafid Sumanjaya" },
-        { "no": 2, "nama": "Alceo Ega Raharjo" },
-        { "no": 3, "nama": "Anargya Syifa Khaliluna" },
-        { "no": 4, "nama": "Aqeelah Adrianayda" },
-        { "no": 5, "nama": "Arcilla Ziya Falisha" },
-        { "no": 6, "nama": "Arfan Fairel Kefrisya" },
-        { "no": 7, "nama": "Askana Sakhi Nurdzikrulloh" },
-        { "no": 8, "nama": "Asyifa Ega Nuraeyza" },
-        { "no": 9, "nama": "Calista Aisha Sachi" },
-        { "no": 10, "nama": "Dastan Tara Rizky" },
-        { "no": 11, "nama": "Fatima Aqilla Azahra Ramadhani" },
-        { "no": 12, "nama": "Hana Felysia" },
-        { "no": 13, "nama": "Hanun Rihadatul Aisy" },
-        { "no": 14, "nama": "Maryam Dini Zelenka" },
-        { "no": 15, "nama": "Mezzaluna Clarissa Audrey" },
-        { "no": 16, "nama": "Muhammad Azhar Rahmatullah Bawana Putra" },
-        { "no": 17, "nama": "Musthafa Zhafran Santosa" },
-        { "no": 18, "nama": "Nadia Azkadina Aisla" },
-        { "no": 19, "nama": "Raffan Nadif Alfarizqi" },
-        { "no": 20, "nama": "Raka Zhafran Khairi" },
-        { "no": 21, "nama": "Shakila Atmirani Suprapto" },
-        { "no": 22, "nama": "Uwais Alfarizqi Husni" },
-        { "no": 23, "nama": "Zaidan" },
-        { "no": 24, "nama": "Arjuna Azka Wiratama" }
-      ],
-      "4E": [
-        { "no": 1, "nama": "Adiba Fatin Azzahra Widiarto" },
-        { "no": 2, "nama": "Aisyah Ayudia Inara" },
-        { "no": 3, "nama": "Amira Nur Humaira" },
-        { "no": 4, "nama": "Andi Muhammad Arjiyanto Nuzul Ihsan" },
-        { "no": 5, "nama": "Aqil Wahib Averroes" },
-        { "no": 6, "nama": "Arzachel Aditya Ramadhan" },
-        { "no": 7, "nama": "Aulian Azzam Athafariz" },
-        { "no": 8, "nama": "Banyu Biru Wahyu Supiyo" },
-        { "no": 9, "nama": "Hasan Ismail" },
-        { "no": 10, "nama": "Ibnu Syahreza Alsardi" },
-        { "no": 11, "nama": "Kalea Althafiyahza Nugroho" },
-        { "no": 12, "nama": "Karamina Rana Malik" },
-        { "no": 13, "nama": "Keenan Hamizan Mahalani" },
-        { "no": 14, "nama": "Khadijah Puti Kemalahayati" },
-        { "no": 15, "nama": "Khalid Hamzy Imawan" },
-        { "no": 16, "nama": "Mezzayumi Clarissa Audrey" },
-        { "no": 17, "nama": "Muhammad Afifuddin Althaf" },
-        { "no": 18, "nama": "Muhammad Almer Zain" },
-        { "no": 19, "nama": "Muhammad Zhafran Arroyan" },
-        { "no": 20, "nama": "Nurul Aulia Maulida" },
-        { "no": 21, "nama": "Raihanah Alia Dewi" },
-        { "no": 22, "nama": "Shofiyah Ameera Rahma Muta'aaliy" },
-        { "no": 23, "nama": "Zalecha Ininnawa" },
-        { "no": 24, "nama": "Zaura Zhariya Zuliansyah" }
-      ],
-      "5A": [
-        { "no": 1, "nama": "Abiyyu Mufid Hariyadi" },
-        { "no": 2, "nama": "Adiba Aairah Nurrizkiya" },
-        { "no": 3, "nama": "Ahmadyasta El Hafizhy Gathandi" },
-        { "no": 4, "nama": "Alesha Alika Putri Utomo" },
-        { "no": 5, "nama": "Almaira Dzikra Azzahwa" },
-        { "no": 6, "nama": "Aqiyas Putra Wardana" },
-        { "no": 7, "nama": "Daniswara Ariobimo Putra Aji" },
-        { "no": 8, "nama": "Ghazi Elfatih Wildani" },
-        { "no": 9, "nama": "Hafshah Humairah Putri Asti" },
-        { "no": 10, "nama": "Kenzo Ahmad Guswantoro" },
-        { "no": 11, "nama": "Mahreen Mustika Sadikin" },
-        { "no": 12, "nama": "Muhammad Alcander Ramadhan" },
-        { "no": 13, "nama": "Muhammad Hasan Ar Rasyid" },
-        { "no": 14, "nama": "Muhammad Nabil Rafly" },
-        { "no": 15, "nama": "Rafardhan Aksa" },
-        { "no": 16, "nama": "Rajwa Nurfadhilah" },
-        { "no": 17, "nama": "Rana Alimah Khumairah" },
-        { "no": 18, "nama": "Salmaa Kusumo Pramesti" },
-        { "no": 19, "nama": "Shofiyyah Zahrani" }
-      ],
-      "5B": [
-        { "no": 1, "nama": "Adiba Asiyah Ramadhani" },
-        { "no": 2, "nama": "Adzana Khaira Hanum" },
-        { "no": 3, "nama": "Ahmad Rafkha Al-Hafizh" },
-        { "no": 4, "nama": "Aqeela Ajwa Khairunnisa" },
-        { "no": 5, "nama": "Athariz Zayyan Alkhalifi" },
-        { "no": 6, "nama": "Aurora Yumna Elshabira" },
-        { "no": 7, "nama": "Chayra Fayyola Nadhifa" },
-        { "no": 8, "nama": "Fa Issaura Almahyra" },
-        { "no": 9, "nama": "Fariz Maulana Arsyi" },
-        { "no": 10, "nama": "Fatih Alfarizi" },
-        { "no": 11, "nama": "Fawwaz Zeeshan Hamizan" },
-        { "no": 12, "nama": "Mafaaza Muttaqiya" },
-        { "no": 13, "nama": "Muhammad Hilmi Ramadhani" },
-        { "no": 14, "nama": "Nael Khairan Malik" },
-        { "no": 15, "nama": "Naufal Faisalhakim" },
-        { "no": 16, "nama": "Rafif Ramadhan Putro Prasetyo" },
-        { "no": 17, "nama": "Rifki Dwi Maulana" },
-        { "no": 18, "nama": "Saif Umar Hakim" },
-        { "no": 19, "nama": "Syafinah Raina Almahyra" },
-        { "no": 20, "nama": "Zaara Zevanya Zalikha" }
-      ],
-      "5C": [
-        { "no": 1, "nama": "Ahmad Arkan Hidayat" },
-        { "no": 2, "nama": "Alesha Zahsi Andrian" },
-        { "no": 3, "nama": "Almaira Shidqiyah Nukuhaly" },
-        { "no": 4, "nama": "Alzena Manha Laiqa Nur Fitria" },
-        { "no": 5, "nama": "Andito Aushaf Kahanan" },
-        { "no": 6, "nama": "Anindita Keisha Zahra" },
-        { "no": 7, "nama": "Aura Athaleta Inara" },
-        { "no": 8, "nama": "Dhaffin Aldric Maulana" },
-        { "no": 9, "nama": "Fatin Nadira Al Mumtaza" },
-        { "no": 10, "nama": "Fildzan Dwibima Nurhidayat" },
-        { "no": 11, "nama": "Gendis Ayu Beningati" },
-        { "no": 12, "nama": "Izzah Husna Amanina" },
-        { "no": 13, "nama": "Kenzie Faiz Hamizan" },
-        { "no": 14, "nama": "Muhammad Abidzar Hasbi Ginanjar" },
-        { "no": 15, "nama": "Muhammad Ayyash Azizan" },
-        { "no": 16, "nama": "Muhammad Kenzie Athilah Syah" },
-        { "no": 17, "nama": "Muhammad Oziel Leandri" },
-        { "no": 18, "nama": "Muhammad Radithya Davin Alfarezel" },
-        { "no": 19, "nama": "Muhammad Syamil Al Fatih" }
-      ],
-      "5D": [
-        { "no": 1, "nama": "Ahmad Khalid Al Fatih" },
-        { "no": 2, "nama": "Ayra Alfathunnisa Sabira" },
-        { "no": 3, "nama": "Azka The Hamzah" },
-        { "no": 4, "nama": "Azmya Izzatu Nisa" },
-        { "no": 5, "nama": "Azura Tavisha Queena" },
-        { "no": 6, "nama": "Deshan Maulana Razzan" },
-        { "no": 7, "nama": "Fannan Faqiih Nur Rafa" },
-        { "no": 8, "nama": "Farah Niltava Annida" },
-        { "no": 9, "nama": "Keanu Nabriel Arrasya" },
-        { "no": 10, "nama": "Muhammad Afkar Atmaja" },
-        { "no": 11, "nama": "Muhammad Faiq Abqari" },
-        { "no": 12, "nama": "Muhammad Keane Aryasatya" },
-        { "no": 13, "nama": "Muhammad Sakha Rabbani" },
-        { "no": 14, "nama": "Nadhira Thafana" },
-        { "no": 15, "nama": "Rashiif Afsar Hawintoro" },
-        { "no": 16, "nama": "Sahla Saida Karima" },
-        { "no": 17, "nama": "Shahia Aisyah Syafazea" },
-        { "no": 18, "nama": "Shanum Wahida Azzahra" },
-        { "no": 19, "nama": "Umar Khalid Andalusia Al Malik" }
-      ],
-      "6A": [
-        { "no": 1, "nama": "Ahmad Nadif" },
-        { "no": 2, "nama": "Ahmad Zafran Al Wafi" },
-        { "no": 3, "nama": "Alifa Hibatiliah" },
-        { "no": 4, "nama": "Alzena Nabilah Anindya Purwa" },
-        { "no": 5, "nama": "Ardio Pratama Ariandi" },
-        { "no": 6, "nama": "Ardiva Nova Azzahra" },
-        { "no": 7, "nama": "Dhafin Ahmad Alfarizqi" },
-        { "no": 8, "nama": "Fakhira Aulia Nissa" },
-        { "no": 9, "nama": "Firendra Ghazi Erdhiya" },
-        { "no": 10, "nama": "Harsya Khayri Afnan" },
-        { "no": 11, "nama": "Humaira Kamil Azkadina" },
-        { "no": 12, "nama": "Jaidan Dzikri Albukhori Sani" },
-        { "no": 13, "nama": "Leandra Aqeela Paris" },
-        { "no": 14, "nama": "Mahveen Bintang Virdaus" },
-        { "no": 15, "nama": "Michaelia Shafa Mubarok" },
-        { "no": 16, "nama": "Muhammad Khairul Anam" },
-        { "no": 17, "nama": "Nur Hamda Tsaniyyah AS" },
-        { "no": 18, "nama": "Oemar Mukhtar Ariwarna" },
-        { "no": 19, "nama": "Raihan Ardatino Rachman" },
-        { "no": 20, "nama": "Rania Shafiya Hakim" },
-        { "no": 21, "nama": "Shafira Nissa Izzati" },
-        { "no": 22, "nama": "Syafiq Izzul Hakim" },
-        { "no": 23, "nama": "Ufaira Uswatunnisa" }
-      ],
-      "6B": [
-        { "no": 1, "nama": "Abu Haura" },
-        { "no": 2, "nama": "Adiba Faranisa Aznii" },
-        { "no": 3, "nama": "Ainayya Mazaya Waluyo" },
-        { "no": 4, "nama": "Alfareza Deyyan Hanindita" },
-        { "no": 5, "nama": "Aliya Izzatul Hayaah" },
-        { "no": 6, "nama": "Annisa Aqilah Aisla" },
-        { "no": 7, "nama": "Azka Zhafran Khairy S" },
-        { "no": 8, "nama": "Darrel Ghaisan Ramadhan" },
-        { "no": 9, "nama": "Faranisa Safna Fela Nugraha" },
-        { "no": 10, "nama": "Fathimah Zian Sarah" },
-        { "no": 11, "nama": "Fhaila Azita Syailest" },
-        { "no": 12, "nama": "Fico Athallah Harnuanto" },
-        { "no": 13, "nama": "Firdaus Arkasena Nismara" },
-        { "no": 14, "nama": "Muhamad Syazwan Firdausa" },
-        { "no": 15, "nama": "Muhammad Hasan Alfaiz" },
-        { "no": 16, "nama": "Muhammad Ziyad Al-waqosh" },
-        { "no": 17, "nama": "Nadia Zhafira" },
-        { "no": 18, "nama": "Naira Alifia Candra" },
-        { "no": 19, "nama": "Naufal Fadhir Rahman" },
-        { "no": 20, "nama": "Sachio Alfarisqi" },
-        { "no": 21, "nama": "Shofia Adzka Nabila" },
-        { "no": 22, "nama": "Talita Shiva" },
-        { "no": 23, "nama": "Teuku Faizan Al Azzami" }
-      ],
-      "6C": [
-        { "no": 1, "nama": "Aaq Qowi Sumanjaya" },
-        { "no": 2, "nama": "Ainayya Fathiyaturahma" },
-        { "no": 3, "nama": "Aluna Chiandanie Gumelar" },
-        { "no": 4, "nama": "Aqila Izzatunnisa Prameswari" },
-        { "no": 5, "nama": "Athariz Khalif Fernandi" },
-        { "no": 6, "nama": "Athaya Dalisha Maulana" },
-        { "no": 7, "nama": "Azalia Zelda Azkadina" },
-        { "no": 8, "nama": "Faqih Abdurrahman Rifai" },
-        { "no": 9, "nama": "Hifdzatus Sa'diah El Adlia" },
-        { "no": 10, "nama": "Ibrahim Karim Wibowo" },
-        { "no": 11, "nama": "Imad Ahsanul Qoid" },
-        { "no": 12, "nama": "Keisha Tri Ramadhani" },
-        { "no": 13, "nama": "Muhammad Gavriel Alvaro" },
-        { "no": 14, "nama": "Muhammad Rafa Adzkia" },
-        { "no": 15, "nama": "Muhammad Rasya Athaya" },
-        { "no": 16, "nama": "Nur'aina Tsalisa Rayhania" },
-        { "no": 17, "nama": "Qafisha Qurratul Aini" },
-        { "no": 18, "nama": "Rafandra Theo Ardhani" },
-        { "no": 19, "nama": "Rayyan Anandra Musyaffa" },
-        { "no": 20, "nama": "Revalina Prischilia Aldian" },
-        { "no": 21, "nama": "Ridwan Rassya Owen Hakiki" },
-        { "no": 22, "nama": "Syakira Nissa Izzati" },
-        { "no": 23, "nama": "Syathir Muhammad Azfar Althaf" }
-      ],
-      "6D": [
-        { "no": 1, "nama": "Alya Nadhifa Putri Kusuma" },
-        { "no": 2, "nama": "Ameera Oryza Sativa Setiyawan" },
-        { "no": 3, "nama": "Athmar Anandhes Kurniawan" },
-        { "no": 4, "nama": "Attayya Kaili Chaerunnisa" },
-        { "no": 5, "nama": "Ayra Haflamira Rahmat" },
-        { "no": 6, "nama": "Azka Azizah Hidayat" },
-        { "no": 7, "nama": "Azlan Mustafa Sadikin" },
-        { "no": 8, "nama": "Azzalea Aqilah" },
-        { "no": 9, "nama": "Elnino Raffaza Arif" },
-        { "no": 10, "nama": "Farrell Alvaronizam" },
-        { "no": 11, "nama": "Hafiz Prima Cendekia" },
-        { "no": 12, "nama": "Khaliza Meidina Balqis R" },
-        { "no": 13, "nama": "Maryam Syaheera Harumi" },
-        { "no": 14, "nama": "Muhammad Pramudya Pratama" },
-        { "no": 15, "nama": "Nai Agatha Ramadhani" },
-        { "no": 16, "nama": "Nasha sabria azkayra" },
-        { "no": 17, "nama": "Nayla Muazara Ulfa Muta Aaliy" },
-        { "no": 18, "nama": "Rafif Fathurrahman" },
-        { "no": 19, "nama": "Rayyan Igo Pamungkas" },
-        { "no": 20, "nama": "Shafana Vallerie Nugroho" },
-        { "no": 21, "nama": "Syahdan Dzaki Altaff" },
-        { "no": 22, "nama": "Umar Abdul Aziz Lubis" },
-        { "no": 23, "nama": "Zafran Abrisam Maulana Haqqi" }
-      ]
-    };
-
-    document.addEventListener("DOMContentLoaded", () => {
-      lucide.createIcons();
-      renderTable(rawDataStore);
-      switchTab('dashboard');
-      updateLiveClock();
-      setInterval(updateLiveClock, 1000);
-    });
-
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      sidebar.classList.toggle('-translate-x-full');
-      if (window.innerWidth < 768) {
-        overlay.classList.toggle('hidden');
-      }
-    }
-
-    function updateLiveClock() {
-      const now = new Date();
-      const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-      const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-
-      const dateStr = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-      const timeStr = now.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
-
-      document.getElementById('headerLiveDate').innerText = dateStr;
-      document.getElementById('headerLiveTime').innerText = timeStr;
-    }
-
-    function switchTab(tabName) {
-      document.getElementById('pageDashboard').classList.add('hidden');
-      document.getElementById('pageJadwal').classList.add('hidden');
-      document.getElementById('pageAbsensi').classList.add('hidden');
-      document.getElementById('pageNilai').classList.add('hidden');
-      document.getElementById('pageRekap').classList.add('hidden');
-
-      const tabs = ['Dashboard', 'Jadwal', 'Absensi', 'Nilai', 'Rekap'];
-      tabs.forEach(t => {
-        const el = document.getElementById(`nav${t}`);
-        if (el) el.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-300 hover:bg-slate-800 transition-all";
-      });
-
-      if (tabName === 'dashboard') {
-        document.getElementById('pageDashboard').classList.remove('hidden');
-        document.getElementById('navDashboard').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm bg-blue-600 text-white transition-all";
-        document.getElementById('pageTitle').innerText = "Dashboard & Input Kelas";
-      } else if (tabName === 'jadwal') {
-        document.getElementById('pageJadwal').classList.remove('hidden');
-        document.getElementById('navJadwal').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm bg-blue-600 text-white transition-all";
-        document.getElementById('pageTitle').innerText = "Daftar Jadwal Kelas";
-      } else if (tabName === 'absensi') {
-        document.getElementById('pageAbsensi').classList.remove('hidden');
-        document.getElementById('navAbsensi').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm bg-blue-600 text-white transition-all";
-        document.getElementById('pageTitle').innerText = "Absensi Siswa Per Kelas";
-      } else if (tabName === 'nilai') {
-        document.getElementById('pageNilai').classList.remove('hidden');
-        document.getElementById('navNilai').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm bg-blue-600 text-white transition-all";
-        document.getElementById('pageTitle').innerText = "Input Penilaian Praktik & Sikap";
-      } else if (tabName === 'rekap') {
-        document.getElementById('pageRekap').classList.remove('hidden');
-        document.getElementById('navRekap').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm bg-blue-600 text-white transition-all";
-        document.getElementById('pageTitle').innerText = "Rekapitulasi Absensi & Nilai";
-        renderRekapTables();
-      }
-    }
-
-    function formatIndonesianDate(dateStr) {
-      if (!dateStr) return "-";
-      let dateObj = (typeof dateStr === 'string' && dateStr.includes('/')) ? new Date(dateStr.split('/').reverse().join('-')) : new Date(dateStr);
-      if (isNaN(dateObj.getTime())) return dateStr;
-
-      const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-      const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      return `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-    }
-
-    function setAllHadir() {
-      const radios = document.querySelectorAll('#absensiTbody input[value="Hadir"]');
-      radios.forEach(r => r.checked = true);
-    }
-
-    function generateAbsensiForm() {
-      const kelasKey = document.getElementById("absensiSelectKelas").value;
-      const tbody = document.getElementById("absensiTbody");
-      tbody.innerHTML = "";
-
-      if (!kelasKey) {
-        tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-400">Pilih kelas di atas untuk memuat daftar siswa.</td></tr>';
-        return;
-      }
-
-      const listSiswa = masterSiswa[kelasKey] || [];
-      listSiswa.forEach(s => {
-        const rowId = `abs_${kelasKey}_${s.no}`;
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-50 border-b border-slate-100";
-        tr.innerHTML = `
-          <td class="py-3 px-4 text-center font-bold text-slate-600">${s.no}</td>
-          <td class="py-3 px-4 font-medium">${s.nama}</td>
-          <td class="py-3 px-4 text-center">
-            <div class="inline-flex space-x-1 bg-slate-100 p-1 rounded-lg text-xs">
-              <label class="px-2.5 py-1 bg-white rounded shadow-sm cursor-pointer"><input type="radio" name="status_${rowId}" value="Hadir" checked> Hadir</label>
-              <label class="px-2.5 py-1 rounded cursor-pointer"><input type="radio" name="status_${rowId}" value="Izin"> Izin</label>
-              <label class="px-2.5 py-1 rounded cursor-pointer"><input type="radio" name="status_${rowId}" value="Sakit"> Sakit</label>
-              <label class="px-2.5 py-1 rounded cursor-pointer"><input type="radio" name="status_${rowId}" value="Alpa"> Alpa</label>
-            </div>
-          </td>
-          <td class="py-3 px-4"><input type="text" id="ket_${rowId}" placeholder="Catatan (opsional)" class="w-full p-1.5 border rounded text-xs"></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function generateNilaiForm() {
-      const kelasKey = document.getElementById("nilaiSelectKelas").value;
-      const tbody = document.getElementById("nilaiTbody");
-      tbody.innerHTML = "";
-
-      if (!kelasKey) {
-        tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">Pilih kelas di atas.</td></tr>';
-        return;
-      }
-
-      const listSiswa = masterSiswa[kelasKey] || [];
-      listSiswa.forEach(s => {
-        const rowId = `nilai_${kelasKey}_${s.no}`;
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-50 border-b border-slate-100";
-        tr.innerHTML = `
-          <td class="py-3 px-4 text-center font-bold text-slate-600">${s.no}</td>
-          <td class="py-3 px-4 font-medium">${s.nama}</td>
-          <td class="py-3 px-4 text-center"><input type="number" id="p1_${rowId}" min="0" max="100" placeholder="0-100" oninput="calculateRowNilai('${rowId}')" class="w-20 p-1.5 border text-center rounded text-sm"></td>
-          <td class="py-3 px-4 text-center"><input type="number" id="p2_${rowId}" min="0" max="100" placeholder="0-100" oninput="calculateRowNilai('${rowId}')" class="w-20 p-1.5 border text-center rounded text-sm"></td>
-          <td class="py-3 px-4 text-center"><input type="number" id="sikap_${rowId}" min="0" max="100" placeholder="0-100" oninput="calculateRowNilai('${rowId}')" class="w-20 p-1.5 border text-center rounded text-sm"></td>
-          <td class="py-3 px-4 text-center font-bold text-slate-700" id="total_${rowId}">0</td>
-          <td class="py-3 px-4 text-center font-bold text-blue-700 bg-blue-50/50" id="avg_${rowId}">0.00</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function calculateRowNilai(rowId) {
-      const valP1 = document.getElementById(`p1_${rowId}`).value;
-      const valP2 = document.getElementById(`p2_${rowId}`).value;
-      const valSikap = document.getElementById(`sikap_${rowId}`).value;
-
-      const p1 = parseFloat(valP1) || 0;
-      const p2 = parseFloat(valP2) || 0;
-      const sikap = parseFloat(valSikap) || 0;
-
-      const total = p1 + p2 + sikap;
-
-      let validComponentsCount = 0;
-      if (valP1 !== "" && p1 > 0) validComponentsCount++;
-      if (valP2 !== "" && p2 > 0) validComponentsCount++;
-      if (valSikap !== "" && sikap > 0) validComponentsCount++;
-
-      let avg = "0.00";
-      if (validComponentsCount > 0) {
-        avg = (total / validComponentsCount).toFixed(2);
-      }
-
-      document.getElementById(`total_${rowId}`).innerText = total % 1 === 0 ? total : total.toFixed(1);
-      document.getElementById(`avg_${rowId}`).innerText = avg;
-    }
-
-    function addSchedule(event) {
-      event.preventDefault();
-      const pertemuan = document.getElementById("pertemuan").value;
-      const kelas = document.getElementById("kelas").value;
-      const jenisKelas = document.getElementById("jenisKelas").value;
-      const tanggal = document.getElementById("tanggal").value;
-
-      rawDataStore.push({ Pertemuan: pertemuan, Kelas: kelas, "Jenis Kelas": jenisKelas, Tanggal: tanggal });
-      
-      document.getElementById("classForm").reset();
-      renderTable(rawDataStore);
-      document.getElementById("statTotal").innerText = rawDataStore.length;
-      document.getElementById("statKelas").innerText = new Set(rawDataStore.map(d => d["Kelas"])).size;
-      alert("Pertemuan berhasil ditambahkan secara lokal!");
-    }
-
-    function renderTable(data) {
-      const tbody = document.querySelector("#dataTable tbody");
-      tbody.innerHTML = "";
-      if(data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400">Belum ada pertemuan ditambahkan.</td></tr>';
-        return;
-      }
-      data.forEach((row, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="py-4 px-6 font-semibold">${row["Pertemuan"] || "-"}</td>
-          <td class="py-4 px-6">${row["Kelas"] || "-"}</td>
-          <td class="py-4 px-6"><span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">${row["Jenis Kelas"] || "-"}</span></td>
-          <td class="py-4 px-6">${formatIndonesianDate(row["Tanggal"])}</td>
-          <td class="py-4 px-6 text-center">
-            <button onclick="deleteRow(${index})" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-      lucide.createIcons();
-    }
-
-    function deleteRow(index) {
-      if (!confirm("Hapus baris jadwal ini?")) return;
-      rawDataStore.splice(index, 1);
-      renderTable(rawDataStore);
-      document.getElementById("statTotal").innerText = rawDataStore.length;
-      document.getElementById("statKelas").innerText = new Set(rawDataStore.map(d => d["Kelas"])).size;
-    }
-
-    function filterTable() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = rawDataStore.filter(row => 
-        (row["Pertemuan"] && row["Pertemuan"].toLowerCase().includes(query)) ||
-        (row["Kelas"] && row["Kelas"].toLowerCase().includes(query)) ||
-        (row["Jenis Kelas"] && row["Jenis Kelas"].toLowerCase().includes(query))
-      );
-      renderTable(filtered);
-    }
-
-    function getClassTotalMeetings() {
-      const classMeetingsMap = {};
-      rawDataStore.forEach(r => {
-        const k = r["Kelas"];
-        if (k) {
-          classMeetingsMap[k] = (classMeetingsMap[k] || 0) + 1;
-        }
-      });
-      return classMeetingsMap;
-    }
-
-    function getMergedRekapData() {
-      const mergedMap = {};
-      const classMeetingsMap = getClassTotalMeetings();
-
-      Object.keys(masterSiswa).forEach(kelasKey => {
-        masterSiswa[kelasKey].forEach(s => {
-          const key = `${kelasKey}_${s.nama}`;
-          mergedMap[key] = {
-            kelas: kelasKey,
-            no: s.no,
-            nama: s.nama,
-            hadir: 0,
-            izin: 0,
-            sakit: 0,
-            alpa: 0,
-            totalKelasPertemuan: classMeetingsMap[kelasKey] || 0,
-            p1Sum: 0,
-            p2Sum: 0,
-            sikapSum: 0,
-            countP1: 0,
-            countP2: 0,
-            countSikap: 0
-          };
-        });
-      });
-
-      rawAbsensiData.forEach(r => {
-        const key = `${r["Kelas"]}_${r["Nama Siswa"]}`;
-        if (!mergedMap[key]) {
-          mergedMap[key] = { kelas: r["Kelas"], no: r["No Absen"] || "-", nama: r["Nama Siswa"], hadir: 0, izin: 0, sakit: 0, alpa: 0, totalKelasPertemuan: 1, p1Sum: 0, p2Sum: 0, sikapSum: 0, countP1: 0, countP2: 0, countSikap: 0 };
-        }
-        const st = (r["Status Kehadiran"] || r["Status"] || "").toLowerCase();
-        if (st === "hadir") mergedMap[key].hadir++;
-        else if (st === "izin") mergedMap[key].izin++;
-        else if (st === "sakit") mergedMap[key].sakit++;
-        else if (st === "alpa") mergedMap[key].alpa++;
-      });
-
-      rawNilaiData.forEach(r => {
-        const key = `${r["Kelas"]}_${r["Nama Siswa"]}`;
-        if (!mergedMap[key]) {
-          mergedMap[key] = { kelas: r["Kelas"], no: r["No Absen"] || "-", nama: r["Nama Siswa"], hadir: 0, izin: 0, sakit: 0, alpa: 0, totalKelasPertemuan: 1, p1Sum: 0, p2Sum: 0, sikapSum: 0, countP1: 0, countP2: 0, countSikap: 0 };
-        }
-        
-        const p1Val = parseFloat(r["Nilai Praktik 1"] || r["Praktik 1"] || 0);
-        const p2Val = parseFloat(r["Nilai Praktik 2"] || r["Praktik 2"] || 0);
-        const sikapVal = parseFloat(r["Nilai Sikap"] || r["Sikap"] || 0);
-
-        if (p1Val > 0) { mergedMap[key].p1Sum += p1Val; mergedMap[key].countP1++; }
-        if (p2Val > 0) { mergedMap[key].p2Sum += p2Val; mergedMap[key].countP2++; }
-        if (sikapVal > 0) { mergedMap[key].sikapSum += sikapVal; mergedMap[key].countSikap++; }
-      });
-
-      return Object.values(mergedMap);
-    }
-
-    function renderRekapTables() {
-      const selectedKelas = document.getElementById("rekapFilterKelas").value;
-      const searchNama = document.getElementById("rekapSearchNama").value.toLowerCase();
-
-      const allStudents = getMergedRekapData();
-
-      const absTbody = document.getElementById("rekapAbsensiTbody");
-      absTbody.innerHTML = "";
-      let absRows = allStudents.filter(item => {
-        const matchK = !selectedKelas || item.kelas === selectedKelas;
-        const matchN = !searchNama || item.nama.toLowerCase().includes(searchNama);
-        return matchK && matchN;
-      });
-
-      if (absRows.length === 0) {
-        absTbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Tidak ada data absensi ditemukan.</td></tr>';
-      } else {
-        absRows.forEach(item => {
-          const totalLogged = item.hadir + item.izin + item.sakit + item.alpa;
-          const totalAcuan = Math.max(totalLogged, item.totalKelasPertemuan, 1);
-          const pct = Math.round((item.hadir / totalAcuan) * 100);
-
-          const tr = document.createElement("tr");
-          tr.className = "hover:bg-slate-50";
-          tr.innerHTML = `
-            <td class="py-3 px-4 font-semibold text-blue-700">${item.kelas}</td>
-            <td class="py-3 px-4 text-center font-bold text-slate-600">${item.no}</td>
-            <td class="py-3 px-4 font-medium">${item.nama}</td>
-            <td class="py-3 px-4 text-center font-bold text-emerald-600">${item.hadir}</td>
-            <td class="py-3 px-4 text-center font-bold text-amber-600">${item.izin}</td>
-            <td class="py-3 px-4 text-center font-bold text-blue-600">${item.sakit}</td>
-            <td class="py-3 px-4 text-center font-bold text-rose-600">${item.alpa}</td>
-            <td class="py-3 px-4 text-center font-bold bg-blue-50/50 text-blue-700">${pct}%</td>
-          `;
-          absTbody.appendChild(tr);
-        });
-      }
-
-      const nilaiTbody = document.getElementById("rekapNilaiTbody");
-      nilaiTbody.innerHTML = "";
-      let nilRows = allStudents.filter(item => {
-        const matchK = !selectedKelas || item.kelas === selectedKelas;
-        const matchN = !searchNama || item.nama.toLowerCase().includes(searchNama);
-        return matchK && matchN;
-      });
-
-      if (nilRows.length === 0) {
-        nilaiTbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Tidak ada data nilai ditemukan.</td></tr>';
-      } else {
-        nilRows.forEach(item => {
-          const avgP1 = item.countP1 > 0 ? (item.p1Sum / item.countP1) : 0;
-          const avgP2 = item.countP2 > 0 ? (item.p2Sum / item.countP2) : 0;
-          const avgSikap = item.countSikap > 0 ? (item.sikapSum / item.countSikap) : 0;
-
-          const totalNilai = avgP1 + avgP2 + avgSikap;
-          
-          let divisor = 0;
-          if (avgP1 > 0) divisor++;
-          if (avgP2 > 0) divisor++;
-          if (avgSikap > 0) divisor++;
-
-          const finalAvg = divisor > 0 ? (totalNilai / divisor).toFixed(2) : "0.00";
-
-          const tr = document.createElement("tr");
-          tr.className = "hover:bg-slate-50";
-          tr.innerHTML = `
-            <td class="py-3 px-4 font-semibold text-blue-700">${item.kelas}</td>
-            <td class="py-3 px-4 text-center font-bold text-slate-600">${item.no}</td>
-            <td class="py-3 px-4 font-medium">${item.nama}</td>
-            <td class="py-3 px-4 text-center">${avgP1 > 0 ? avgP1.toFixed(1) : "0.0"}</td>
-            <td class="py-3 px-4 text-center">${avgP2 > 0 ? avgP2.toFixed(1) : "0.0"}</td>
-            <td class="py-3 px-4 text-center">${avgSikap > 0 ? avgSikap.toFixed(1) : "0.0"}</td>
-            <td class="py-3 px-4 text-center font-bold text-slate-700">${totalNilai.toFixed(1)}</td>
-            <td class="py-3 px-4 text-center font-bold bg-amber-50 text-amber-800">${finalAvg}</td>
-          `;
-          nilaiTbody.appendChild(tr);
-        });
-      }
-    }
-
-    function generatePDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('l', 'mm', 'a4');
-
-      const selectedKelas = document.getElementById("rekapFilterKelas").value || "Semua Kelas";
-      const filterTitle = selectedKelas !== "Semua Kelas" ? `KELAS ${selectedKelas}` : "SELURUH KELAS";
-
-      doc.setFont("Lexend", "bold");
-      doc.setFontSize(16);
-      doc.text(`LAPORAN REKAPITULASI PRESENSI & NILAI SISWA`, 14, 15);
-      
-      doc.setFontSize(11);
-      doc.setFont("Lexend", "normal");
-      doc.text(`Tingkat / Kelas : ${filterTitle}`, 14, 22);
-      doc.text(`Tanggal Cetak  : ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`, 14, 27);
-
-      const allStudents = getMergedRekapData();
-      const rows = allStudents.filter(item => {
-        return selectedKelas === "Semua Kelas" || item.kelas === selectedKelas;
-      });
-
-      if (rows.length === 0) {
-        alert("Tidak ada data rekap yang dapat dicetak!");
-        return;
-      }
-
-      const tableData = rows.map((item, index) => {
-        const totalLogged = item.hadir + item.izin + item.sakit + item.alpa;
-        const totalAcuan = Math.max(totalLogged, item.totalKelasPertemuan, 1);
-        const pctHadir = Math.round((item.hadir / totalAcuan) * 100) + "%";
-
-        const avgP1 = item.countP1 > 0 ? (item.p1Sum / item.countP1) : 0;
-        const avgP2 = item.countP2 > 0 ? (item.p2Sum / item.countP2) : 0;
-        const avgSikap = item.countSikap > 0 ? (item.sikapSum / item.countSikap) : 0;
-
-        const totalNilai = avgP1 + avgP2 + avgSikap;
-        let divisor = 0;
-        if (avgP1 > 0) divisor++;
-        if (avgP2 > 0) divisor++;
-        if (avgSikap > 0) divisor++;
-
-        const finalAvg = divisor > 0 ? (totalNilai / divisor).toFixed(2) : "0.00";
-
-        return [
-          index + 1,
-          item.kelas,
-          item.no,
-          item.nama,
-          `${item.hadir} Hadir`,
-          pctHadir,
-          avgP1 > 0 ? avgP1.toFixed(1) : "0.0",
-          avgP2 > 0 ? avgP2.toFixed(1) : "0.0",
-          totalNilai.toFixed(1),
-          finalAvg
-        ];
-      });
-
-      doc.autoTable({
-        startY: 33,
-        head: [['No', 'Kelas', 'No Absen', 'Nama Siswa', 'Kehadiran', '% Hadir', 'Praktik 1', 'Praktik 2', 'Nilai Total', 'Rata-Rata']],
-        body: tableData,
-        theme: 'grid',
-        headStyles: { fillColor: [30, 41, 59], textColor: 255, fontStyle: 'bold', halign: 'center' },
-        columnStyles: {
-          0: { halign: 'center', cellWidth: 12 },
-          1: { halign: 'center', cellWidth: 18 },
-          2: { halign: 'center', cellWidth: 20 },
-          3: { cellWidth: 70 },
-          4: { halign: 'center' },
-          5: { halign: 'center' },
-          6: { halign: 'center' },
-          7: { halign: 'center' },
-          8: { halign: 'center', fontStyle: 'bold' },
-          9: { halign: 'center', fontStyle: 'bold' }
-        },
-        styles: { fontSize: 9, cellPadding: 2.5 }
-      });
-
-      doc.save(`Rekapitulasi_Siswa_${selectedKelas.replace(/\s+/g, '_')}.pdf`);
-    }
-
-    function submitAbsensi() {
-      const rawDate = document.getElementById("absensiTanggal").value;
-      const pertemuan = document.getElementById("absensiPertemuan").value;
-      const kelasKey = document.getElementById("absensiSelectKelas").value;
-
-      if (!rawDate || !pertemuan || !kelasKey) {
-        alert("Lengkapi Tanggal, Pertemuan Ke-, dan Pilih Kelas!");
-        return;
-      }
-
-      const formattedDate = formatIndonesianDate(rawDate);
-      const listSiswa = masterSiswa[kelasKey] || [];
-
-      listSiswa.forEach(s => {
-        const rowId = `abs_${kelasKey}_${s.no}`;
-        const statusEl = document.querySelector(`input[name="status_${rowId}"]:checked`);
-        const ketEl = document.getElementById(`ket_${rowId}`);
-
-        rawAbsensiData.push({
-          "Tanggal": formattedDate,
-          "Pertemuan": pertemuan,
-          "Kelas": kelasKey,
-          "No Absen": s.no,
-          "Nama Siswa": s.nama,
-          "Status Kehadiran": statusEl ? statusEl.value : "Hadir",
-          "Keterangan": ketEl ? ketEl.value : ""
-        });
-      });
-
-      alert(`Absensi Kelas ${kelasKey} berhasil disimpan!`);
-    }
-
-    function submitNilai() {
-      const rawDate = document.getElementById("nilaiTanggal").value;
-      const pertemuan = document.getElementById("nilaiPertemuan").value;
-      const kelasKey = document.getElementById("nilaiSelectKelas").value;
-
-      if (!rawDate || !pertemuan || !kelasKey) {
-        alert("Lengkapi Tanggal Evaluasi, Pertemuan Ke-, dan Pilih Kelas!");
-        return;
-      }
-
-      const formattedDate = formatIndonesianDate(rawDate);
-      const listSiswa = masterSiswa[kelasKey] || [];
-
-      listSiswa.forEach(s => {
-        const rowId = `nilai_${kelasKey}_${s.no}`;
-        const p1 = document.getElementById(`p1_${rowId}`).value || "0";
-        const p2 = document.getElementById(`p2_${rowId}`).value || "0";
-        const sikap = document.getElementById(`sikap_${rowId}`).value || "0";
-        const total = document.getElementById(`total_${rowId}`).innerText;
-        const avg = document.getElementById(`avg_${rowId}`).innerText;
-
-        rawNilaiData.push({
-          "Tanggal": formattedDate,
-          "Pertemuan": pertemuan,
-          "Kelas": kelasKey,
-          "No Absen": s.no,
-          "Nama Siswa": s.nama,
-          "Nilai Praktik 1": p1,
-          "Nilai Praktik 2": p2,
-          "Nilai Sikap": sikap,
-          "Jumlah Nilai": total,
-          "Nilai Rata-rata": avg
-        });
-      });
-
-      alert(`Nilai Kelas ${kelasKey} berhasil disimpan!`);
-    }
-  </script>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-indigo-700 text-white shadow-md no-print sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-2.5 rounded-xl backdrop-blur-md">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-amber-300"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg sm:text-xl leading-tight">Sistem Absensi Siswa</h1>
+                    <p class="text-xs text-indigo-200">Tahun Pelajaran 2026/2027 • SD Negeri Utama</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button id="btnNavHarian" onclick="switchTab('harian')" class="px-3.5 py-2 rounded-lg text-sm font-semibold transition bg-white/20 text-white hover:bg-white/30 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-check"></i> Presensi Harian
+                </button>
+                <button id="btnNavRekap" onclick="switchTab('rekap')" class="px-3.5 py-2 rounded-lg text-sm font-semibold transition text-indigo-100 hover:bg-white/10 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie"></i> Rekap Bulanan
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1">
+
+        <!-- Banner Laporan Cetak (Hanya tampil saat di-print) -->
+        <div class="print-only mb-6 border-b-2 border-slate-900 pb-4">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold uppercase tracking-wide">Laporan Presensi Siswa</h2>
+                <p class="text-sm font-medium text-slate-600">Tahun Pelajaran 2026/2027</p>
+            </div>
+            <div class="mt-4 flex justify-between text-xs font-semibold">
+                <p>Kelas: <span id="printKelasInfo" class="font-bold">-</span></p>
+                <p>Tanggal: <span id="printTanggalInfo" class="font-bold">-</span></p>
+                <p>Total Siswa: <span id="printTotalInfo" class="font-bold">-</span></p>
+            </div>
+        </div>
+
+        <!-- TAB 1: PRESENSI HARIAN -->
+        <div id="tabHarian" class="space-y-6">
+            <!-- Top Control Bar -->
+            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80 no-print flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
+                
+                <!-- Filter Inputs -->
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full md:w-auto">
+                    <div class="w-full sm:w-48">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Pilih Kelas</label>
+                        <div class="relative">
+                            <select id="selectKelas" onchange="renderSiswaList()" class="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                                <optgroup label="Kelas 4">
+                                    <option value="4A" selected>Kelas 4A (24 Siswa)</option>
+                                    <option value="4B">Kelas 4B (24 Siswa)</option>
+                                    <option value="4C">Kelas 4C (24 Siswa)</option>
+                                    <option value="4D">Kelas 4D (23 Siswa)</option>
+                                    <option value="4E">Kelas 4E (24 Siswa)</option>
+                                </optgroup>
+                                <optgroup label="Kelas 5">
+                                    <option value="5A">Kelas 5A (19 Siswa)</option>
+                                    <option value="5B">Kelas 5B (20 Siswa)</option>
+                                    <option value="5C">Kelas 5C (19 Siswa)</option>
+                                    <option value="5D">Kelas 5D (19 Siswa)</option>
+                                </optgroup>
+                                <optgroup label="Kelas 6">
+                                    <option value="6A">Kelas 6A (23 Siswa)</option>
+                                    <option value="6B">Kelas 6B (23 Siswa)</option>
+                                    <option value="6C">Kelas 6C (23 Siswa)</option>
+                                    <option value="6D">Kelas 6D (23 Siswa)</option>
+                                </optgroup>
+                            </select>
+                            <i class="fa-solid fa-users text-slate-400 absolute left-3 top-3 text-sm"></i>
+                            <i class="fa-solid fa-chevron-down text-slate-400 absolute right-3 top-3 text-xs pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <div class="w-full sm:w-44">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Tanggal Presensi</label>
+                        <div class="relative">
+                            <input type="date" id="inputTanggal" onchange="loadPresensiData()" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <i class="fa-solid fa-calendar text-slate-400 absolute left-3 top-3 text-sm"></i>
+                        </div>
+                    </div>
+
+                    <div class="w-full sm:w-64">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Cari Nama Siswa</label>
+                        <div class="relative">
+                            <input type="text" id="inputSearch" onkeyup="filterSiswa()" placeholder="Ketik nama siswa..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-3 top-3 text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 pt-2 md:pt-0 border-t md:border-t-0 border-slate-200">
+                    <button onclick="exportToExcel()" class="flex-1 md:flex-none px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
+                    <button onclick="window.print()" class="flex-1 md:flex-none px-3.5 py-2.5 bg-slate-700 hover:bg-slate-800 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print"></i> Cetak PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Metric Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-3">
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <i class="fa-solid fa-user-group text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Total Siswa</p>
+                        <p id="statTotal" class="text-lg font-bold text-slate-800">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center space-x-3">
+                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                        <i class="fa-solid fa-circle-check text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Hadir (H)</p>
+                        <p id="statHadir" class="text-lg font-bold text-emerald-600">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center space-x-3">
+                    <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
+                        <i class="fa-solid fa-notes-medical text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Sakit (S)</p>
+                        <p id="statSakit" class="text-lg font-bold text-amber-600">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-indigo-100 shadow-sm flex items-center space-x-3">
+                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <i class="fa-solid fa-envelope-open-text text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Izin (I)</p>
+                        <p id="statIzin" class="text-lg font-bold text-indigo-600">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-rose-100 shadow-sm flex items-center space-x-3">
+                    <div class="p-3 bg-rose-50 text-rose-600 rounded-xl">
+                        <i class="fa-solid fa-circle-xmark text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Alpa (A)</p>
+                        <p id="statAlpa" class="text-lg font-bold text-rose-600">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-purple-100 shadow-sm flex items-center space-x-3 col-span-2 sm:col-span-1">
+                    <div class="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                        <i class="fa-solid fa-chart-line text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Kehadiran</p>
+                        <p id="statPersen" class="text-lg font-bold text-purple-600">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Bulk Actions -->
+            <div class="bg-slate-100 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 no-print">
+                <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider pl-1">
+                    <i class="fa-solid fa-bolt text-amber-500 mr-1"></i> Aksi Cepat Presensi:
+                </span>
+                <div class="flex items-center gap-2">
+                    <button onclick="setAllStatus('Hadir')" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-lg text-xs font-semibold transition">
+                        <i class="fa-solid fa-check text-xs"></i> Set Semua Hadir
+                    </button>
+                    <button onclick="resetAllStatus()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold transition">
+                        <i class="fa-solid fa-rotate-left text-xs"></i> Reset Presensi
+                    </button>
+                </div>
+            </div>
+
+            <!-- Student List Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-bold uppercase">
+                                <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Nama Siswa</th>
+                                <th class="py-3.5 px-4 text-center w-16">L/P</th>
+                                <th class="py-3.5 px-4 text-center w-80">Status Kehadiran</th>
+                                <th class="py-3.5 px-4 no-print">Keterangan Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="siswaTableBody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Dynamic Content Rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="emptyMessage" class="hidden py-12 text-center text-slate-400">
+                    <i class="fa-solid fa-user-slash text-4xl mb-2"></i>
+                    <p class="text-sm">Tidak ada nama siswa yang cocok dengan pencarian.</p>
+                </div>
+            </div>
+
+            <!-- Save Notification Toast -->
+            <div id="saveToast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center space-x-3 transform translate-y-20 opacity-0 transition-all duration-300 no-print z-50">
+                <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+                <span id="toastMsg" class="text-xs font-medium">Data presensi berhasil disimpan!</span>
+            </div>
+        </div>
+
+        <!-- TAB 2: REKAP BULANAN -->
+        <div id="tabRekap" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 no-print flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Pilih Kelas Rekap</label>
+                        <select id="selectRekapKelas" onchange="renderRekapBulanan()" class="py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold">
+                            <option value="4A">Kelas 4A</option><option value="4B">Kelas 4B</option><option value="4C">Kelas 4C</option><option value="4D">Kelas 4D</option><option value="4E">Kelas 4E</option>
+                            <option value="5A">Kelas 5A</option><option value="5B">Kelas 5B</option><option value="5C">Kelas 5C</option><option value="5D">Kelas 5D</option>
+                            <option value="6A">Kelas 6A</option><option value="6B">Kelas 6B</option><option value="6C">Kelas 6C</option><option value="6D">Kelas 6D</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Pilih Bulan & Tahun</label>
+                        <input type="month" id="inputRekapBulan" onchange="renderRekapBulanan()" class="py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold">
+                    </div>
+                </div>
+                <button onclick="exportRekapToExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-excel"></i> Download Rekap Excel
+                </button>
+            </div>
+
+            <!-- Rekap Table View -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 text-sm sm:text-base flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i> Akumulasi Presensi Siswa
+                    </h3>
+                    <span id="rekapPeriodTag" class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-semibold"></span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
+                                <th class="py-3 px-4 text-center w-12">No</th>
+                                <th class="py-3 px-4">Nama Siswa</th>
+                                <th class="py-3 px-4 text-center w-16">L/P</th>
+                                <th class="py-3 px-4 text-center font-semibold text-emerald-700">Hadir (H)</th>
+                                <th class="py-3 px-4 text-center font-semibold text-amber-700">Sakit (S)</th>
+                                <th class="py-3 px-4 text-center font-semibold text-indigo-700">Izin (I)</th>
+                                <th class="py-3 px-4 text-center font-semibold text-rose-700">Alpa (A)</th>
+                                <th class="py-3 px-4 text-center">% Kehadiran</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rekapTableBody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // DATA MASTER SISWA 288 NAMA LENGKAP HINGGA KELAS 6D SESUAI FILE EXCEL
+        const DATA_SISWA = {
+            "4A": [
+                { "no": 1, "nama": "Al Birru Raga Syahumpri", "gender": "L" },
+                { "no": 2, "nama": "Arsenio Ananda Abqori", "gender": "L" },
+                { "no": 3, "nama": "Azzam Al Fattah Kurniawan", "gender": "L" },
+                { "no": 4, "nama": "Fadhlan Erdogan", "gender": "L" },
+                { "no": 5, "nama": "Gendis Shabrina Nuralifa", "gender": "P" },
+                { "no": 6, "nama": "Ghaisan Array Pramana", "gender": "L" },
+                { "no": 7, "nama": "Ghina Inayah", "gender": "P" },
+                { "no": 8, "nama": "Hafidza Ahna Farihah", "gender": "P" },
+                { "no": 9, "nama": "Hafiqa Anindita Husna", "gender": "P" },
+                { "no": 10, "nama": "Hana Izzatunnisa", "gender": "P" },
+                { "no": 11, "nama": "Ibrahim Athallah Irvani", "gender": "L" },
+                { "no": 12, "nama": "Jehan Almahyra Mecca", "gender": "P" },
+                { "no": 13, "nama": "Karina Naladeva Almaarief", "gender": "P" },
+                { "no": 14, "nama": "Khadijah Samila", "gender": "P" },
+                { "no": 15, "nama": "Mahreen Naima Almedina", "gender": "P" },
+                { "no": 16, "nama": "Mishal Azfer Fathian", "gender": "L" },
+                { "no": 17, "nama": "Muhammad Rafif Alfarezi", "gender": "L" },
+                { "no": 18, "nama": "Rahardian Kael Setiawan", "gender": "L" },
+                { "no": 19, "nama": "Safaira Putri Kusuma", "gender": "P" },
+                { "no": 20, "nama": "Shanika Umaiza", "gender": "P" },
+                { "no": 21, "nama": "Surga Faiha Shaliha", "gender": "P" },
+                { "no": 22, "nama": "Syafiqah Firzanah Althafunnisa", "gender": "P" },
+                { "no": 23, "nama": "Umar Karim Fatahillah", "gender": "L" },
+                { "no": 24, "nama": "Zidane Alfatih Raqila Shahbaz", "gender": "L" }
+            ],
+            "4B": [
+                { "no": 1, "nama": "Abimanyu Indradewa", "gender": "L" },
+                { "no": 2, "nama": "Abrar Syafiq Ramadan", "gender": "L" },
+                { "no": 3, "nama": "Althaf Figo Kurniawan", "gender": "L" },
+                { "no": 4, "nama": "Alya Nidaul Karimah", "gender": "P" },
+                { "no": 5, "nama": "Auliya Az-Zahrah", "gender": "P" },
+                { "no": 6, "nama": "Azzalia Salsabila Queensha Yudira", "gender": "P" },
+                { "no": 7, "nama": "Daffa Alif Alfarizqi", "gender": "L" },
+                { "no": 8, "nama": "Fidelio Shaquile Gavyn Nainggolan", "gender": "L" },
+                { "no": 9, "nama": "Guinandra Fawish Aiden", "gender": "L" },
+                { "no": 10, "nama": "Hamizan Althaff Lukiawan", "gender": "L" },
+                { "no": 11, "nama": "Hanifah Ghayda Muhtasyam", "gender": "P" },
+                { "no": 12, "nama": "Hanna Siti Maryam", "gender": "P" },
+                { "no": 13, "nama": "Kayyisa Azkadina", "gender": "P" },
+                { "no": 14, "nama": "Kiano Alrafaeyza Harnuanto", "gender": "L" },
+                { "no": 15, "nama": "Laode Alvaronizam Akmar", "gender": "L" },
+                { "no": 16, "nama": "Mikayla Heaserra Anaketio", "gender": "P" },
+                { "no": 17, "nama": "Muhammad Rashid As-Shiddiq", "gender": "L" },
+                { "no": 18, "nama": "Naura Jihan Azzahra", "gender": "P" },
+                { "no": 19, "nama": "Nazila Andhisa Mahveen", "gender": "P" },
+                { "no": 20, "nama": "Nur Haidar Almairi Tsaqib", "gender": "P" },
+                { "no": 21, "nama": "Rayyan Atalla Zavier", "gender": "L" },
+                { "no": 22, "nama": "Shadia Tsuraya Nugroho", "gender": "P" },
+                { "no": 23, "nama": "Sofia Elmira Azkadina", "gender": "P" },
+                { "no": 24, "nama": "Yukeiko Kamila Putri Kelana", "gender": "P" }
+            ],
+            "4C": [
+                { "no": 1, "nama": "Abdurrobbi Attaqi Haneeyyah", "gender": "L" },
+                { "no": 2, "nama": "Ahmad Amru Kintoko", "gender": "L" },
+                { "no": 3, "nama": "Alesha Putri Chairunnisa", "gender": "P" },
+                { "no": 4, "nama": "Aliyahayu Kayshila Pangayuh", "gender": "P" },
+                { "no": 5, "nama": "Almeera Rainy Khumaira", "gender": "P" },
+                { "no": 6, "nama": "Alsyamra Rasezha Shihan", "gender": "P" },
+                { "no": 7, "nama": "Artanabil Faeyza Yazid Abbasy", "gender": "L" },
+                { "no": 8, "nama": "Danish Asyraf Fahreza", "gender": "L" },
+                { "no": 9, "nama": "Eldira Rahma Hayuningtyas", "gender": "L" },
+                { "no": 10, "nama": "Farsya Zerina Mahreen Rusthady", "gender": "P" },
+                { "no": 11, "nama": "Halima Nahda Ashadia", "gender": "P" },
+                { "no": 12, "nama": "Hasya Aulia Az Zahra", "gender": "P" },
+                { "no": 13, "nama": "Ibrahim Arkan Al Farisi", "gender": "P" },
+                { "no": 14, "nama": "Kalyana Adzkiya Vivaldy", "gender": "P" },
+                { "no": 15, "nama": "Lubna Luvena Maysun", "gender": "P" },
+                { "no": 16, "nama": "Maryam Hamalatul Bayan", "gender": "P" },
+                { "no": 17, "nama": "Muhammad Althaf Aulian", "gender": "L" },
+                { "no": 18, "nama": "Muhammad Fahry Al Zaidhan", "gender": "L" },
+                { "no": 19, "nama": "Muhammad Hanif Kamil", "gender": "L" },
+                { "no": 20, "nama": "Muhammad Kholif Al Hafidz", "gender": "L" },
+                { "no": 21, "nama": "Negara Adhya Prananta Harahap", "gender": "L" },
+                { "no": 22, "nama": "Qiana Naira Shaliha", "gender": "P" },
+                { "no": 23, "nama": "Rajendra Alim Ariyani", "gender": "L" },
+                { "no": 24, "nama": "Restuandaru", "gender": "L" }
+            ],
+            "4D": [
+                { "no": 1, "nama": "Abqari Khafid Sumanjaya", "gender": "L" },
+                { "no": 2, "nama": "Alceo Ega Raharjo", "gender": "L" },
+                { "no": 3, "nama": "Anargya Syifa Khaliluna", "gender": "P" },
+                { "no": 4, "nama": "Aqeelah Adrianayda", "gender": "P" },
+                { "no": 5, "nama": "Arcilla Ziya Falisha", "gender": "P" },
+                { "no": 6, "nama": "Arfan Fairel Kefrisya", "gender": "L" },
+                { "no": 7, "nama": "Askana Sakhi Nurdzikrulloh", "gender": "P" },
+                { "no": 8, "nama": "Asyifa Ega Nuraeyza", "gender": "P" },
+                { "no": 9, "nama": "Calista Aisha Sachi", "gender": "P" },
+                { "no": 10, "nama": "Dastan Tara Rizky", "gender": "L" },
+                { "no": 11, "nama": "Fatima Aqilla Azahra Ramadhani", "gender": "P" },
+                { "no": 12, "nama": "Hana Felysia", "gender": "P" },
+                { "no": 13, "nama": "Hanun Rihadatul Aisy", "gender": "P" },
+                { "no": 14, "nama": "Maryam Dini Zelenka", "gender": "P" },
+                { "no": 15, "nama": "Mezzaluna Clarissa Audrey", "gender": "P" },
+                { "no": 16, "nama": "Muhammad Azhar Rahmatullah Bawana Putra", "gender": "L" },
+                { "no": 17, "nama": "Musthafa Zhafran Santosa", "gender": "L" },
+                { "no": 18, "nama": "Nadia Azkadina Aisla", "gender": "P" },
+                { "no": 19, "nama": "Raffan Nadif Alfarizqi", "gender": "L" },
+                { "no": 20, "nama": "Raka Zhafran Khairi", "gender": "L" },
+                { "no": 21, "nama": "Shakila Atmirani Suprapto", "gender": "P" },
+                { "no": 22, "nama": "Uwais Alfarizqi Husni", "gender": "L" },
+                { "no": 23, "nama": "Zaidan", "gender": "L" }
+            ],
+            "4E": [
+                { "no": 1, "nama": "Adiba Fatin Azzahra Widiarto", "gender": "P" },
+                { "no": 2, "nama": "Aisyah Ayudia Inara", "gender": "P" },
+                { "no": 3, "nama": "Amira Nur Humaira", "gender": "P" },
+                { "no": 4, "nama": "Andi Muhammad Arjiyanto Nuzul Ihsan", "gender": "L" },
+                { "no": 5, "nama": "Aqil Wahib Averroes", "gender": "L" },
+                { "no": 6, "nama": "Arzachel Aditya Ramadhan", "gender": "L" },
+                { "no": 7, "nama": "Aulian Azzam Athafariz", "gender": "L" },
+                { "no": 8, "nama": "Banyu Biru Wahyu Supiyo", "gender": "L" },
+                { "no": 9, "nama": "Hasan Ismail", "gender": "L" },
+                { "no": 10, "nama": "Ibnu Syahreza Alsardi", "gender": "L" },
+                { "no": 11, "nama": "Kalea Althafiyahza Nugroho", "gender": "P" },
+                { "no": 12, "nama": "Karamina Rana Malik", "gender": "P" },
+                { "no": 13, "nama": "Keenan Hamizan Mahalani", "gender": "L" },
+                { "no": 14, "nama": "Khadijah Puti Kemalahayati", "gender": "P" },
+                { "no": 15, "nama": "Khalid Hamzy Imawan", "gender": "L" },
+                { "no": 16, "nama": "Mezzayumi Clarissa Audrey", "gender": "P" },
+                { "no": 17, "nama": "Muhammad Afifuddin Althaf", "gender": "L" },
+                { "no": 18, "nama": "Muhammad Almer Zain", "gender": "L" },
+                { "no": 19, "nama": "Muhammad Zhafran Arroyan", "gender": "L" },
+                { "no": 20, "nama": "Nurul Aulia Maulida", "gender": "P" },
+                { "no": 21, "nama": "Raihanah Alia Dewi", "gender": "P" },
+                { "no": 22, "nama": "Shofiyah Ameera Rahma Muta'aaliy", "gender": "P" },
+                { "no": 23, "nama": "Zalecha Ininnawa", "gender": "P" },
+                { "no": 24, "nama": "Zaura Zhariya Zuliansyah", "gender": "P" }
+            ],
+            "5A": [
+                { "no": 1, "nama": "Abiyyu Mufid Hariyadi", "gender": "L" },
+                { "no": 2, "nama": "Adiba Aairah Nurrizkiya", "gender": "P" },
+                { "no": 3, "nama": "Ahmadyasta El Hafizhy Gathandi", "gender": "L" },
+                { "no": 4, "nama": "Alesha Alika Putri Utomo", "gender": "P" },
+                { "no": 5, "nama": "Almaira Dzikra Azzahwa", "gender": "P" },
+                { "no": 6, "nama": "Aqiyas Putra Wardana", "gender": "L" },
+                { "no": 7, "nama": "Daniswara Ariobimo Putra Aji", "gender": "L" },
+                { "no": 8, "nama": "Ghazi Elfatih Wildani", "gender": "L" },
+                { "no": 9, "nama": "Hafshah Humairah Putri Asti", "gender": "P" },
+                { "no": 10, "nama": "Kenzo Ahmad Guswantoro", "gender": "L" },
+                { "no": 11, "nama": "Mahreen Mustika Sadikin", "gender": "P" },
+                { "no": 12, "nama": "Muhammad Alcander Ramadhan", "gender": "L" },
+                { "no": 13, "nama": "Muhammad Hasan Ar Rasyid", "gender": "L" },
+                { "no": 14, "nama": "Muhammad Nabil Rafly", "gender": "L" },
+                { "no": 15, "nama": "Rafardhan Aksa", "gender": "L" },
+                { "no": 16, "nama": "Rajwa Nurfadhilah", "gender": "P" },
+                { "no": 17, "nama": "Rana Alimah Khumairah", "gender": "P" },
+                { "no": 18, "nama": "Salmaa Kusumo Pramesti", "gender": "P" },
+                { "no": 19, "nama": "Shofiyyah Zahrani", "gender": "P" }
+            ],
+            "5B": [
+                { "no": 1, "nama": "Adiba Asiyah Ramadhani", "gender": "P" },
+                { "no": 2, "nama": "Adzana Khaira Hanum", "gender": "P" },
+                { "no": 3, "nama": "Ahmad Rafkha Al-Hafizh", "gender": "L" },
+                { "no": 4, "nama": "Aqeela Ajwa Khairunnisa", "gender": "P" },
+                { "no": 5, "nama": "Athariz Zayyan Alkhalifi", "gender": "L" },
+                { "no": 6, "nama": "Aurora Yumna Elshabira", "gender": "P" },
+                { "no": 7, "nama": "Chayra Fayyola Nadhifa", "gender": "P" },
+                { "no": 8, "nama": "Fa Issaura Almahyra", "gender": "P" },
+                { "no": 9, "nama": "Fariz Maulana Arsyi", "gender": "L" },
+                { "no": 10, "nama": "Fatih Alfarizi", "gender": "L" },
+                { "no": 11, "nama": "Fawwaz Zeeshan Hamizan", "gender": "L" },
+                { "no": 12, "nama": "Mafaaza Muttaqiya", "gender": "P" },
+                { "no": 13, "nama": "Muhammad Hilmi Ramadhani", "gender": "L" },
+                { "no": 14, "nama": "Nael Khairan Malik", "gender": "L" },
+                { "no": 15, "nama": "Naufal Faisalhakim", "gender": "L" },
+                { "no": 16, "nama": "Rafif Ramadhan Putro Prasetyo", "gender": "L" },
+                { "no": 17, "nama": "Rifki Dwi Maulana", "gender": "L" },
+                { "no": 18, "nama": "Saif Umar Hakim", "gender": "L" },
+                { "no": 19, "nama": "Syafinah Raina Almahyra", "gender": "P" },
+                { "no": 20, "nama": "Zaara Zevanya Zalikha", "gender": "P" }
+            ],
+            "5C": [
+                { "no": 1, "nama": "Ahmad Arkan Hidayat", "gender": "L" },
+                { "no": 2, "nama": "Alesha Zahsi Andrian", "gender": "P" },
+                { "no": 3, "nama": "Almaira Shidqiyah Nukuhaly", "gender": "P" },
+                { "no": 4, "nama": "Alzena Manha Laiqa Nur Fitria", "gender": "P" },
+                { "no": 5, "nama": "Andito Aushaf Kahanan", "gender": "L" },
+                { "no": 6, "nama": "Anindita Keisha Zahra", "gender": "P" },
+                { "no": 7, "nama": "Aura Athaleta Inara", "gender": "P" },
+                { "no": 8, "nama": "Dhaffin Aldric Maulana", "gender": "L" },
+                { "no": 9, "nama": "Fatin Nadira Al Mumtaza", "gender": "P" },
+                { "no": 10, "nama": "Fildzan Dwibima Nurhidayat", "gender": "L" },
+                { "no": 11, "nama": "Gendis  Ayu Beningati", "gender": "P" },
+                { "no": 12, "nama": "Izzah Husna Amanina", "gender": "P" },
+                { "no": 13, "nama": "Kenzie Faiz Hamizan", "gender": "L" },
+                { "no": 14, "nama": "Muhammad Abidzar Hasbi Ginanjar", "gender": "L" },
+                { "no": 15, "nama": "Muhammad Ayyash Azizan", "gender": "L" },
+                { "no": 16, "nama": "Muhammad Kenzie Athilah Syah", "gender": "L" },
+                { "no": 17, "nama": "Muhammad Oziel Leandri", "gender": "L" },
+                { "no": 18, "nama": "Muhammad Radithya Davin Alfarezel", "gender": "L" },
+                { "no": 19, "nama": "Muhammad Syamil Al Fatih", "gender": "L" }
+            ],
+            "5D": [
+                { "no": 1, "nama": "Ahmad Khalid Al Fatih", "gender": "L" },
+                { "no": 2, "nama": "Ayra Alfathunnisa Sabira", "gender": "P" },
+                { "no": 3, "nama": "Azka The Hamzah", "gender": "L" },
+                { "no": 4, "nama": "Azmya Izzatu Nisa", "gender": "P" },
+                { "no": 5, "nama": "Azura Tavisha Queena", "gender": "P" },
+                { "no": 6, "nama": "Deshan Maulana Razzan", "gender": "L" },
+                { "no": 7, "nama": "Fannan Faqiih Nur Rafa", "gender": "L" },
+                { "no": 8, "nama": "Farah Niltava Annida", "gender": "P" },
+                { "no": 9, "nama": "Keanu Nabriel Arrasya", "gender": "L" },
+                { "no": 10, "nama": "Muhammad Afkar Atmaja", "gender": "L" },
+                { "no": 11, "nama": "Muhammad Faiq Abqari", "gender": "L" },
+                { "no": 12, "nama": "Muhammad Keane Aryasatya", "gender": "L" },
+                { "no": 13, "nama": "Muhammad Sakha Rabbani", "gender": "L" },
+                { "no": 14, "nama": "Nadhira Thafana", "gender": "P" },
+                { "no": 15, "nama": "Rashiif Afsar Hawintoro", "gender": "L" },
+                { "no": 16, "nama": "Sahla Saida Karima", "gender": "P" },
+                { "no": 17, "nama": "Shahia Aisyah Syafazea", "gender": "P" },
+                { "no": 18, "nama": "Shanum Wahida Azzahra", "gender": "P" },
+                { "no": 19, "nama": "Umar Khalid Andalusia Al Malik", "gender": "L" }
+            ],
+            "6A": [
+                { "no": 1, "nama": "Ahmad Nadif", "gender": "L" },
+                { "no": 2, "nama": "Ahmad Zafran Al Wafi", "gender": "L" },
+                { "no": 3, "nama": "Alifa Hibatiliah", "gender": "P" },
+                { "no": 4, "nama": "Alzena Nabilah Anindya Purwa", "gender": "P" },
+                { "no": 5, "nama": "Ardio Pratama Ariandi", "gender": "L" },
+                { "no": 6, "nama": "Ardiva Nova Azzahra", "gender": "P" },
+                { "no": 7, "nama": "Dhafin Ahmad Alfarizqi", "gender": "L" },
+                { "no": 8, "nama": "Fakhira Aulia Nissa", "gender": "P" },
+                { "no": 9, "nama": "Firendra Ghazi Erdhiya", "gender": "L" },
+                { "no": 10, "nama": "Harsya Khayri Afnan", "gender": "L" },
+                { "no": 11, "nama": "Humaira Kamil Azkadina", "gender": "P" },
+                { "no": 12, "nama": "Jaidan Dzikri Albukhori Sani", "gender": "L" },
+                { "no": 13, "nama": "Leandra Aqeela Paris", "gender": "P" },
+                { "no": 14, "nama": "Mahveen Bintang Virdaus", "gender": "L" },
+                { "no": 15, "nama": "Michaelia Shafa Mubarok", "gender": "P" },
+                { "no": 16, "nama": "Muhammad Khairul Anam", "gender": "L" },
+                { "no": 17, "nama": "Nur Hamda Tsaniyyah AS", "gender": "P" },
+                { "no": 18, "nama": "Oemar Mukhtar Ariwarna", "gender": "L" },
+                { "no": 19, "nama": "Raihan Ardatino Rachman", "gender": "L" },
+                { "no": 20, "nama": "Rania Shafiya Hakim", "gender": "P" },
+                { "no": 21, "nama": "Shafira Nissa Izzati", "gender": "P" },
+                { "no": 22, "nama": "Syafiq Izzul Hakim", "gender": "L" },
+                { "no": 23, "nama": "Ufaira Uswatunnisa", "gender": "P" }
+            ],
+            "6B": [
+                { "no": 1, "nama": "Abu Haura", "gender": "L" },
+                { "no": 2, "nama": "Adiba Faranisa Aznii", "gender": "P" },
+                { "no": 3, "nama": "Ainayya Mazaya Waluyo", "gender": "P" },
+                { "no": 4, "nama": "Alfareza Deyyan Hanindita", "gender": "L" },
+                { "no": 5, "nama": "Aliya Izzatul Hayaah", "gender": "P" },
+                { "no": 6, "nama": "Annisa Aqilah Aisla", "gender": "P" },
+                { "no": 7, "nama": "Azka Zhafran Khairy S", "gender": "L" },
+                { "no": 8, "nama": "Darrel Ghaisan Ramadhan", "gender": "L" },
+                { "no": 9, "nama": "Faranisa Safna Fela Nugraha", "gender": "P" },
+                { "no": 10, "nama": "Fathimah Zian Sarah", "gender": "P" },
+                { "no": 11, "nama": "Fhaila Azita Syailest", "gender": "P" },
+                { "no": 12, "nama": "Fico Athallah Harnuanto", "gender": "L" },
+                { "no": 13, "nama": "Firdaus Arkasena Nismara", "gender": "L" },
+                { "no": 14, "nama": "Muhamad Syazwan Firdausa", "gender": "L" },
+                { "no": 15, "nama": "Muhammad Hasan Alfaiz", "gender": "L" },
+                { "no": 16, "nama": "Muhammad Ziyad Al-waqosh", "gender": "L" },
+                { "no": 17, "nama": "Nadia Zhafira", "gender": "P" },
+                { "no": 18, "nama": "Naira Alifia Candra", "gender": "P" },
+                { "no": 19, "nama": "Naufal Fadhir Rahman", "gender": "L" },
+                { "no": 20, "nama": "Sachio Alfarisqi", "gender": "L" },
+                { "no": 21, "nama": "Shofia Adzka Nabila", "gender": "P" },
+                { "no": 22, "nama": "Talita Shiva", "gender": "P" },
+                { "no": 23, "nama": "Teuku Faizan Al Azzami", "gender": "L" }
+            ],
+            "6C": [
+                { "no": 1, "nama": "Aaq Qowi Sumanjaya", "gender": "L" },
+                { "no": 2, "nama": "Ainayya Fathiyaturahma", "gender": "P" },
+                { "no": 3, "nama": "Aluna Chiandanie Gumelar", "gender": "P" },
+                { "no": 4, "nama": "Aqila Izzatunnisa Prameswari", "gender": "P" },
+                { "no": 5, "nama": "Athariz Khalif Fernandi", "gender": "L" },
+                { "no": 6, "nama": "Athaya Dalisha Maulana", "gender": "P" },
+                { "no": 7, "nama": "Azalia Zelda Azkadina", "gender": "P" },
+                { "no": 8, "nama": "Faqih Abdurrahman Rifai", "gender": "L" },
+                { "no": 9, "nama": "Hifdzatus Sa'diah El Adlia", "gender": "P" },
+                { "no": 10, "nama": "Ibrahim Karim Wibowo", "gender": "L" },
+                { "no": 11, "nama": "Imad Ahsanul Qoid", "gender": "L" },
+                { "no": 12, "nama": "Keisha Tri Ramadhani", "gender": "P" },
+                { "no": 13, "nama": "Muhammad Gavriel Alvaro", "gender": "L" },
+                { "no": 14, "nama": "Muhammad Rafa Adzkia", "gender": "L" },
+                { "no": 15, "nama": "Muhammad Rasya Athaya", "gender": "L" },
+                { "no": 16, "nama": "Nur'aina Tsalisa Rayhania", "gender": "P" },
+                { "no": 17, "nama": "Qafisha Qurratul Aini", "gender": "P" },
+                { "no": 18, "nama": "Rafandra Theo Ardhani", "gender": "L" },
+                { "no": 19, "nama": "Rayyan Anandra Musyaffa", "gender": "L" },
+                { "no": 20, "nama": "Revalina Prischilia Aldian", "gender": "P" },
+                { "no": 21, "nama": "Ridwan Rassya Owen Hakiki", "gender": "L" },
+                { "no": 22, "nama": "Syakira Nissa Izzati", "gender": "P" },
+                { "no": 23, "nama": "Syathir Muhammad Azfar Althaf", "gender": "L" }
+            ],
+            "6D": [
+                { "no": 1, "nama": "Alya Nadhifa Putri Kusuma", "gender": "P" },
+                { "no": 2, "nama": "Ameera Oryza Sativa Setiyawan", "gender": "P" },
+                { "no": 3, "nama": "Athmar Anandhes Kurniawan", "gender": "L" },
+                { "no": 4, "nama": "Attayya Kaili Chaerunnisa", "gender": "P" },
+                { "no": 5, "nama": "Ayra Haflamira Rahmat", "gender": "P" },
+                { "no": 6, "nama": "Azka Azizah Hidayat", "gender": "P" },
+                { "no": 7, "nama": "Azlan Mustafa Sadikin", "gender": "L" },
+                { "no": 8, "nama": "Azzalea Aqilah", "gender": "P" },
+                { "no": 9, "nama": "Elnino Raffaza Arif", "gender": "L" },
+                { "no": 10, "nama": "Farrell Alvaronizam", "gender": "L" },
+                { "no": 11, "nama": "Hafiz Prima Cendekia", "gender": "L" },
+                { "no": 12, "nama": "Khaliza Meidina Balqis R", "gender": "P" },
+                { "no": 13, "nama": "Maryam Syaheera Harumi", "gender": "P" },
+                { "no": 14, "nama": "Muhammad Pramudya Pratama", "gender": "L" },
+                { "no": 15, "nama": "Nai Agatha Ramadhani", "gender": "P" },
+                { "no": 16, "nama": "Nasha sabria azkayra", "gender": "P" },
+                { "no": 17, "nama": "Nayla Muazara Ulfa Muta Aaliy", "gender": "P" },
+                { "no": 18, "nama": "Rafif Fathurrahman", "gender": "L" },
+                { "no": 19, "nama": "Rayyan Igo  Pamungkas", "gender": "L" },
+                { "no": 20, "nama": "Shafana Vallerie Nugroho", "gender": "P" },
+                { "no": 21, "nama": "Syahdan Dzaki Altaff", "gender": "L" },
+                { "no": 22, "nama": "Umar Abdul Aziz Lubis", "gender": "L" },
+                { "no": 23, "nama": "Zafran Abrisam Maulana Haqqi", "gender": "L" }
+            ]
+        };
+
+        // Global State & Storage Key Prefix
+        const STORAGE_KEY = 'ABSENSI_SD_2026_2027';
+        let currentPresensi = {};
+
+        // Window Load Initialization
+        window.onload = function() {
+            // Set Default Date to Today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inputTanggal').value = today;
+            
+            const currentMonth = today.substring(0, 7);
+            document.getElementById('inputRekapBulan').value = currentMonth;
+
+            // Load initial view
+            renderSiswaList();
+        };
+
+        // Tab Navigation Switcher
+        function switchTab(tabName) {
+            const tabHarian = document.getElementById('tabHarian');
+            const tabRekap = document.getElementById('tabRekap');
+            const btnNavHarian = document.getElementById('btnNavHarian');
+            const btnNavRekap = document.getElementById('btnNavRekap');
+
+            if (tabName === 'harian') {
+                tabHarian.classList.remove('hidden');
+                tabRekap.classList.add('hidden');
+                btnNavHarian.className = "px-3.5 py-2 rounded-lg text-sm font-semibold transition bg-white/20 text-white hover:bg-white/30 flex items-center gap-2";
+                btnNavRekap.className = "px-3.5 py-2 rounded-lg text-sm font-semibold transition text-indigo-100 hover:bg-white/10 flex items-center gap-2";
+            } else {
+                tabHarian.classList.add('hidden');
+                tabRekap.classList.remove('hidden');
+                btnNavRekap.className = "px-3.5 py-2 rounded-lg text-sm font-semibold transition bg-white/20 text-white hover:bg-white/30 flex items-center gap-2";
+                btnNavHarian.className = "px-3.5 py-2 rounded-lg text-sm font-semibold transition text-indigo-100 hover:bg-white/10 flex items-center gap-2";
+                renderRekapBulanan();
+            }
+        }
+
+        // Render Student List for Selected Class & Date
+        function renderSiswaList() {
+            const kelas = document.getElementById('selectKelas').value;
+            const tanggal = document.getElementById('inputTanggal').value;
+            const tableBody = document.getElementById('siswaTableBody');
+            
+            // Update Print Info Metadata
+            document.getElementById('printKelasInfo').innerText = kelas;
+            document.getElementById('printTanggalInfo').innerText = tanggal;
+
+            // Fetch stored data from LocalStorage
+            const storedData = getStoredData(kelas, tanggal);
+            currentPresensi = storedData || {};
+
+            const siswaArr = DATA_SISWA[kelas] || [];
+            document.getElementById('printTotalInfo').innerText = `${siswaArr.length} Siswa`;
+
+            tableBody.innerHTML = '';
+
+            siswaArr.forEach((siswa) => {
+                const status = currentPresensi[siswa.no]?.status || 'Hadir'; // Default Hadir
+                const catatan = currentPresensi[siswa.no]?.catatan || '';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100 siswa-row";
+                tr.setAttribute('data-nama', siswa.nama.toLowerCase());
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-semibold text-slate-500 text-xs">${siswa.no}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">${siswa.nama}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2 py-0.5 rounded text-xs font-bold ${siswa.gender === 'L' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">
+                            ${siswa.gender}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="inline-flex rounded-xl p-1 bg-slate-100 gap-1 border border-slate-200/60">
+                            <button type="button" onclick="updateStatus('${kelas}', '${tanggal}', ${siswa.no}, 'Hadir')" 
+                                class="status-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${status === 'Hadir' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+                                Hadir
+                            </button>
+                            <button type="button" onclick="updateStatus('${kelas}', '${tanggal}', ${siswa.no}, 'Sakit')" 
+                                class="status-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${status === 'Sakit' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+                                Sakit
+                            </button>
+                            <button type="button" onclick="updateStatus('${kelas}', '${tanggal}', ${siswa.no}, 'Izin')" 
+                                class="status-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${status === 'Izin' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+                                Izin
+                            </button>
+                            <button type="button" onclick="updateStatus('${kelas}', '${tanggal}', ${siswa.no}, 'Alpa')" 
+                                class="status-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${status === 'Alpa' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+                                Alpa
+                            </button>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 no-print">
+                        <input type="text" value="${catatan}" onchange="updateCatatan('${kelas}', '${tanggal}', ${siswa.no}, this.value)" 
+                            placeholder="Tambahkan catatan..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-500 focus:bg-white">
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+
+                // Initialize current state if empty
+                if (!currentPresensi[siswa.no]) {
+                    currentPresensi[siswa.no] = { status: 'Hadir', catatan: '' };
+                }
+            });
+
+            saveToLocalStorage(kelas, tanggal, currentPresensi);
+            updateSummaryMetrics();
+        }
+
+        // Update Attendance Status of Student
+        function updateStatus(kelas, tanggal, no, newStatus) {
+            if (!currentPresensi[no]) {
+                currentPresensi[no] = { status: newStatus, catatan: '' };
+            } else {
+                currentPresensi[no].status = newStatus;
+            }
+
+            saveToLocalStorage(kelas, tanggal, currentPresensi);
+            renderSiswaList();
+            showToast(`Status presensi siswa No. ${no} diperbarui menjadi ${newStatus}`);
+        }
+
+        // Update Optional Note/Catatan
+        function updateCatatan(kelas, tanggal, no, catatanText) {
+            if (!currentPresensi[no]) {
+                currentPresensi[no] = { status: 'Hadir', catatan: catatanText };
+            } else {
+                currentPresensi[no].catatan = catatanText;
+            }
+            saveToLocalStorage(kelas, tanggal, currentPresensi);
+            showToast(`Catatan No. ${no} tersimpan.`);
+        }
+
+        // Quick Bulk Actions: Set All Present
+        function setAllStatus(targetStatus) {
+            const kelas = document.getElementById('selectKelas').value;
+            const tanggal = document.getElementById('inputTanggal').value;
+            const siswaArr = DATA_SISWA[kelas] || [];
+
+            siswaArr.forEach(siswa => {
+                const currentNote = currentPresensi[siswa.no]?.catatan || '';
+                currentPresensi[siswa.no] = { status: targetStatus, catatan: currentNote };
+            });
+
+            saveToLocalStorage(kelas, tanggal, currentPresensi);
+            renderSiswaList();
+            showToast(`Semua siswa berhasil diset '${targetStatus}'!`);
+        }
+
+        // Quick Bulk Actions: Reset All
+        function resetAllStatus() {
+            setAllStatus('Hadir');
+        }
+
+        // Calculate and Update Header Metrics
+        function updateSummaryMetrics() {
+            const kelas = document.getElementById('selectKelas').value;
+            const totalSiswa = (DATA_SISWA[kelas] || []).length;
+            
+            let hadir = 0, sakit = 0, izin = 0, alpa = 0;
+
+            Object.values(currentPresensi).forEach(item => {
+                if (item.status === 'Hadir') hadir++;
+                else if (item.status === 'Sakit') sakit++;
+                else if (item.status === 'Izin') izin++;
+                else if (item.status === 'Alpa') alpa++;
+            });
+
+            const percent = totalSiswa > 0 ? Math.round((hadir / totalSiswa) * 100) : 0;
+
+            document.getElementById('statTotal').innerText = totalSiswa;
+            document.getElementById('statHadir').innerText = hadir;
+            document.getElementById('statSakit').innerText = sakit;
+            document.getElementById('statIzin').innerText = izin;
+            document.getElementById('statAlpa').innerText = alpa;
+            document.getElementById('statPersen').innerText = `${percent}%`;
+        }
+
+        // Real-Time Student Filter
+        function filterSiswa() {
+            const query = document.getElementById('inputSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('.siswa-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const nama = row.getAttribute('data-nama');
+                if (nama.includes(query)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const emptyMsg = document.getElementById('emptyMessage');
+            if (visibleCount === 0) {
+                emptyMsg.classList.remove('hidden');
+            } else {
+                emptyMsg.classList.add('hidden');
+            }
+        }
+
+        // LocalStorage Helpers
+        function getStoredData(kelas, tanggal) {
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            return (allData[kelas] && allData[kelas][tanggal]) ? allData[kelas][tanggal] : null;
+        }
+
+        function saveToLocalStorage(kelas, tanggal, data) {
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            if (!allData[kelas]) allData[kelas] = {};
+            allData[kelas][tanggal] = data;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+        }
+
+        function loadPresensiData() {
+            renderSiswaList();
+        }
+
+        // Toast Notification Helper
+        function showToast(msg) {
+            const toast = document.getElementById('saveToast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = msg;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // Render Monthly Aggregated Attendance Report
+        function renderRekapBulanan() {
+            const kelas = document.getElementById('selectRekapKelas').value;
+            const bulanTahun = document.getElementById('inputRekapBulan').value; // YYYY-MM
+            const rekapTableBody = document.getElementById('rekapTableBody');
+            
+            document.getElementById('rekapPeriodTag').innerText = `Bulan: ${bulanTahun} • Kelas ${kelas}`;
+            
+            const siswaArr = DATA_SISWA[kelas] || [];
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            const kelasData = allData[kelas] || {};
+
+            // Filter dates matching selected YYYY-MM
+            const matchingDates = Object.keys(kelasData).filter(date => date.startsWith(bulanTahun));
+
+            rekapTableBody.innerHTML = '';
+
+            siswaArr.forEach(siswa => {
+                let h = 0, s = 0, i = 0, a = 0;
+
+                matchingDates.forEach(date => {
+                    const presensiDate = kelasData[date];
+                    if (presensiDate && presensiDate[siswa.no]) {
+                        const st = presensiDate[siswa.no].status;
+                        if (st === 'Hadir') h++;
+                        else if (st === 'Sakit') s++;
+                        else if (st === 'Izin') i++;
+                        else if (st === 'Alpa') a++;
+                    }
+                });
+
+                const totalHari = matchingDates.length;
+                const percent = totalHari > 0 ? Math.round((h / totalHari) * 100) : 0;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center text-slate-500 font-semibold text-xs">${siswa.no}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">${siswa.nama}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2 py-0.5 rounded text-xs font-bold ${siswa.gender === 'L' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">
+                            ${siswa.gender}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-center font-bold text-emerald-600">${h}</td>
+                    <td class="py-3 px-4 text-center font-bold text-amber-600">${s}</td>
+                    <td class="py-3 px-4 text-center font-bold text-indigo-600">${i}</td>
+                    <td class="py-3 px-4 text-center font-bold text-rose-600">${a}</td>
+                    <td class="py-3 px-4 text-center font-bold text-purple-600">${percent}%</td>
+                `;
+                rekapTableBody.appendChild(tr);
+            });
+        }
+
+        // Export Daily Presensi to Excel (.xlsx)
+        function exportToExcel() {
+            const kelas = document.getElementById('selectKelas').value;
+            const tanggal = document.getElementById('inputTanggal').value;
+            const siswaArr = DATA_SISWA[kelas] || [];
+
+            const excelData = siswaArr.map(siswa => {
+                const item = currentPresensi[siswa.no] || { status: 'Hadir', catatan: '' };
+                return {
+                    "No": siswa.no,
+                    "Nama Siswa": siswa.nama,
+                    "L/P": siswa.gender,
+                    "Kelas": kelas,
+                    "Tanggal": tanggal,
+                    "Status Kehadiran": item.status,
+                    "Keterangan": item.catatan
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, `Absensi ${kelas}`);
+
+            // Download File
+            XLSX.writeFile(workbook, `Absensi_Kelas_${kelas}_${tanggal}.xlsx`);
+        }
+
+        // Export Monthly Rekap to Excel (.xlsx)
+        function exportRekapToExcel() {
+            const kelas = document.getElementById('selectRekapKelas').value;
+            const bulanTahun = document.getElementById('inputRekapBulan').value;
+            const siswaArr = DATA_SISWA[kelas] || [];
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            const kelasData = allData[kelas] || {};
+
+            const matchingDates = Object.keys(kelasData).filter(date => date.startsWith(bulanTahun));
+
+            const excelData = siswaArr.map(siswa => {
+                let h = 0, s = 0, i = 0, a = 0;
+                matchingDates.forEach(date => {
+                    const st = kelasData[date]?.[siswa.no]?.status;
+                    if (st === 'Hadir') h++;
+                    else if (st === 'Sakit') s++;
+                    else if (st === 'Izin') i++;
+                    else if (st === 'Alpa') a++;
+                });
+
+                const totalHari = matchingDates.length;
+                const percent = totalHari > 0 ? Math.round((h / totalHari) * 100) : 0;
+
+                return {
+                    "No": siswa.no,
+                    "Nama Siswa": siswa.nama,
+                    "L/P": siswa.gender,
+                    "Kelas": kelas,
+                    "Periode Bulan": bulanTahun,
+                    "Hadir (H)": h,
+                    "Sakit (S)": s,
+                    "Izin (I)": i,
+                    "Alpa (A)": a,
+                    "% Kehadiran": `${percent}%`
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, `Rekap ${kelas}`);
+
+            XLSX.writeFile(workbook, `Rekap_Bulanan_Kelas_${kelas}_${bulanTahun}.xlsx`);
+        }
+    </script>
 </body>
 </html>
